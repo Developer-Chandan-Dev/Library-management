@@ -1,0 +1,151 @@
+🛠️ Admin Panel Structure
+✅ Core Pages (Screens)
+Dashboard (Home)
+
+Sheets Management
+
+Student Management
+
+Add Student
+
+Sheet Assignment/Edit
+
+Analytics & Stats
+
+Settings (Optional)
+
+Auth/Login Page (if protected)
+
+📄 Page-wise Sections & Features
+1. 📊 Dashboard Page
+Purpose: Overview of sheet status and student count
+
+Sections:
+
+Total sheets: 60
+
+Free sheets
+
+Fully occupied
+
+Half occupied (first/last half)
+
+Pie chart / Bar graph (optional)
+
+Extras:
+
+Quick filter: show only free/full/half
+
+Quick links: [Add Student] [View All Sheets]
+
+2. 📋 Sheets Management
+Purpose: View and manage all 60 sheets
+
+Features:
+
+Grid/table of all sheets with:
+
+Sheet Number
+
+Status (Free, Half Occupied, Full)
+
+Assigned Student(s)
+
+Time Slot(s)
+
+Action: Edit / Remove
+
+Color-coded sheet status
+
+Filter:
+
+Show Free only
+
+Show Full-time only
+
+Show Half-time only
+
+3. 👨‍🎓 Student Management
+Purpose: View, search, or edit student records
+
+Features:
+
+Table of students with:
+
+Name
+
+Time slot
+
+Assigned Sheet
+
+Phone (optional)
+
+Action: Edit / Remove
+
+Filters:
+
+Slot type (full/first/last)
+
+Sheet number
+
+4. ➕ Add Student
+Form fields:
+
+Name
+
+Phone (optional)
+
+Time Slot (dropdown: full_time, first_half, last_half)
+
+Assign to available sheet (filtered by time slot)
+
+Form logic:
+
+Disable sheets already fully occupied or having both half slots filled
+
+5. 📝 Edit Sheet Assignment
+Triggered when admin clicks a sheet
+
+Features:
+
+See current assigned student(s)
+
+Add or remove full/half-time assignment
+
+Auto-detect conflicts (e.g. already occupied)
+
+Save changes
+
+6. 📈 Analytics Page (Optional)
+Metrics to show:
+
+Daily new students
+
+Most used sheets
+
+Peak usage times
+
+Slot type popularity
+
+7. ⚙️ Settings Page (Optional)
+Update system rules (e.g. change total sheets)
+
+Toggle public visibility
+
+Admin password update
+
+8. 🔐 Admin Login Page
+If you want to restrict access:
+
+Simple login with Appwrite Auth
+
+Admin-only access
+
+💡 UI Suggestions
+Use a sidebar layout (Dashboard, Sheets, Students, etc.)
+
+Use shadcn/ui + Tailwind CSS for clean components
+
+Status chips: ✅ 🟡 🔴 with tooltips
+
+Tables with pagination, search, and filter
