@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Student } from "./data";
+import {Student} from "@/types";
 
 export const columns: ColumnDef<Student>[] = [
   {

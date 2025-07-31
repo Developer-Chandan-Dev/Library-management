@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import {
-  ColumnDef,
   ColumnFiltersState,
   SortingState,
   VisibilityState,
@@ -34,16 +33,21 @@ import {
 } from "@/components/ui/table"
 
 import { columns } from "./columns"
-import { dummyStudents } from "./data"
+import {Student} from "@/types";
 
-export function StudentDataTable() {
+
+interface StudentDataTableProps {
+  students: Student[]
+}
+
+export function StudentDataTable({ students }: StudentDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
 
   const table = useReactTable({
-    data: dummyStudents,
+    data: students,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

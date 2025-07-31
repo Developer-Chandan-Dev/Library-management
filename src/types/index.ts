@@ -11,7 +11,7 @@ export type Student = {
   id: string;
   name: string;
   slot: "full_time" | "first_half" | "last_half";
-  sheetNumber: number | null;
+  sheetNumber: number;
   phone?: string;
 };
 

@@ -1,40 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
-import { account } from "./lib/appwrite/appwrite";
+import { createSessionClient } from "@/lib/appwrite";
 
 export async function middleware(request: NextRequest) {
-  const isAdminRoute = request.nextUrl.pathname.startsWith("/dashboard");
+  const dashboardPath = "/dashboard";
 
-  // Retrieve the session token from the incoming request's cookies
-  const sessionToken = request.cookies.get("session")?.value;
+  // Skip non-dashboard routes
+  if (!request.nextUrl.pathname.startsWith(dashboardPath)) {
+    return NextResponse.next();
+  }
 
-  //   if (isAdminRoute) {
-  //     if (!sessionToken) {
-  //       // No session token, redirect to login
-  //       return NextResponse.redirect(new URL("/sign-in", request.url));
-  //     }
+  try{
+    // 1. Get an account
+    const { account } = await createSessionClient();
 
-  //     try {
-  //       // Validate the session token with Appwrite
-  //       const user = await account.get(); // Or use a custom validation function if needed
-  //       // Assuming 'account.get()' successfully retrieves the user if the session is valid
+    if (!account) {
+      return redirectToLogin(request, "appwrite-session");
+    }
 
-  //       if (!user) {
-  //         // Appwrite validation failed, redirect to login
-  //         return NextResponse.redirect(new URL("/sign-in", request.url));
-  //       }
+    // 2. Get user directly from Appwrite
+    const currentUser = await account.get();
 
-  //       // If the session is valid, proceed
-  //       return NextResponse.next();
+    // 3. Check the admin label (critical security check)
+    const isAdmin = currentUser.labels?.includes('admin');
 
-  //     } catch (error) {
-  //       console.error("Appwrite session validation error:", error);
-  //       // Handle the error (e.g., redirect to login or show an error page)
-  //       return NextResponse.redirect(new URL("/sign-in", request.url));
-  //     }
-  //   }
+    if (!isAdmin) {
+      return new NextResponse("Access Denied", { status: 403 });
+    }
 
-  //   // For non-admin routes or if not an admin route, proceed
-  //   return NextResponse.next();
+    // 4. Admin detected - allow access
+    return NextResponse.next();
+
+  }catch(error){
+    console.log(error);
+    return redirectToLogin(request, 'appwrite-session');
+  }
+}
+
+// Helper function for login redirect
+function redirectToLogin(request: NextRequest, cookieName: string) {
+  const response = NextResponse.redirect(new URL('/sign-in', request.url));
+  response.cookies.delete(cookieName);
+  return response;
 }
 
 export const config = {

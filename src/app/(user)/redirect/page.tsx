@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { account, ADMIN_TEAM_ID, teams } from "@/lib/appwrite";
+import { account, ADMIN_TEAM_ID, teams } from "@/lib/appwrite/appwrite";
 import { useRouter } from "next/navigation";
 
 export default function RedirectPage() {

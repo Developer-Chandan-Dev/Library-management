@@ -3,6 +3,7 @@ import { SheetCard } from "@/components/dashboard/SheetCard";
 import { generatedSheets } from "@/lib/generatedSheets";
 
 const Sheets = () => {
+    console.log(generatedSheets);
   return (
     <main className="p-4">
       <h1 className="text-3xl font-bold mb-6 text-center">

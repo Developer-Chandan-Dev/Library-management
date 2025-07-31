@@ -165,9 +165,9 @@ export const SidebarLink = ({
   const { open, animate } = useSidebar();
   return (
     <a
-      href={`/dashboard/${link.href}`}
+      href={link.href && `/dashboard/${link.href}`}
       className={cn(
-        "flex items-center justify-start gap-2  group/sidebar py-2",
+        "flex items-center justify-start gap-2  group/sidebar py-2 cursor-pointer",
         className
       )}
       {...props}

@@ -64,7 +64,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
     setError("");
 
     try {
-      let user =
+      const user =
         type === "sign-up"
           ? await createAccount({
               fullName: values.fullname || "",

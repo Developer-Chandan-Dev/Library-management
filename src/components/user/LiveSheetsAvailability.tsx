@@ -1,6 +1,5 @@
 "use client";
 
-import { Box, Lock, Search, Settings, Sparkles } from "lucide-react";
 import { GlowingEffect } from "@/components/ui/glowing-effect";
 
 export function LiveSheetsAvailability() {

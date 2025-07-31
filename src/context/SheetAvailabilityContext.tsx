@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { dummySheets } from "@/constants/data";
+import { generatedSheets } from '@/lib/generatedSheets'
 import { Sheet } from "@/types";
 
 interface SheetAvailabilityContextType {
@@ -23,9 +24,10 @@ export function SheetAvailabilityProvider({
   children: React.ReactNode;
 }) {
   const [sheets, setSheets] = React.useState<Sheet[]>([]);
+  console.log(generatedSheets, dummySheets);
 
   React.useEffect(() => {
-    // Initialize sheets with dummy data
+    // Initialize sheets with fake data
     setSheets(dummySheets);
   }, []);
 
@@ -41,14 +43,14 @@ export function SheetAvailabilityProvider({
             if (slot === "full_time") {
               return { ...sheet, status: "full_time", fullTimeName: name };
             } else if (slot === "first_half") {
-              // If lastHalfName exists, set status to "full_time", else "first_half"
+              // If the lastHalfName exists, set the status to "full_time", else "first_half"
               return {
                 ...sheet,
                 status: sheet.lastHalfName ? "full_time" : "first_half",
                 firstHalfName: name,
               };
             } else if (slot === "last_half") {
-              // If firstHalfName exists, set status to "full_time", else "last_half"
+              // If the firstHalfName exists, set the status to "full_time", else "last_half"
               return {
                 ...sheet,
                 status: sheet.firstHalfName ? "full_time" : "last_half",
