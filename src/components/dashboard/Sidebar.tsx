@@ -54,9 +54,9 @@ export function SidebarDemo() {
   ];
 
   const [open, setOpen] = useState(false);
-  // const [id, setId] = React.useState("");
+  const [id, setId] = React.useState("");
   const [name, setName] = React.useState("");
-  // const [email, setEmail] = React.useState("");
+  const [email, setEmail] = React.useState("");
   const [avatar, setAvatar] = React.useState("");
 
   useEffect(() => {

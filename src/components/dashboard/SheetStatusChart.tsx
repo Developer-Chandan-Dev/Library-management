@@ -14,7 +14,7 @@ interface SheetStatusChartProps {
 
 export function SheetStatusChart({ data }: SheetStatusChartProps) {
   // Define custom labels for the pie chart if needed, or let Recharts handle default
-  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }: any) => {
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * Math.PI / 180);
     const y = cy + radius * Math.sin(-midAngle * Math.PI / 180);

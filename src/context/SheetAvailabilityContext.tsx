@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { dummySheets } from "@/constants/data";
-import { generatedSheets } from '@/lib/generatedSheets'
+import { generatedSheets} from '@/lib/generatedSheets'
 import { Sheet } from "@/types";
 
 interface SheetAvailabilityContextType {
@@ -24,11 +24,13 @@ export function SheetAvailabilityProvider({
   children: React.ReactNode;
 }) {
   const [sheets, setSheets] = React.useState<Sheet[]>([]);
-  console.log(generatedSheets, dummySheets);
 
   React.useEffect(() => {
-    // Initialize sheets with fake data
-    setSheets(dummySheets);
+    const fetchSheets = async () => {
+      const data = await generatedSheets();
+      setSheets(data);
+    };
+    fetchSheets().then(r => console.log(r));
   }, []);
 
   const updateSheet = React.useCallback(

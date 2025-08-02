@@ -1,19 +1,72 @@
 "use client";
 import { StudentDataTable } from '@/components/dashboard/student-management/StudentDataTable'
 import { Button } from '@/components/ui/button'
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {AddStudentForm} from "@/components/dashboard/student-management/AddStudentForm";
 import {Student} from "@/types";
 import {dummyStudents} from "@/constants/data";
 import {SheetAvailabilityProvider} from "@/context/SheetAvailabilityContext";
+import {addNewStudent, getAllStudents} from "@/lib/actions/students.action";
 
 const StudentManagementPageContent = () => {
-    const [students, setStudents] = useState<Student[]>(dummyStudents)
+    const [students, setStudents] = useState<Student[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
     // const { sheets } = useSheetAvailability()
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-    const handleAddStudent = (newStudent: Student) => {
-        setStudents(prev => [...prev, newStudent])
+
+    const fetchStudents = async () => {
+        try {
+            setIsLoading(true);
+            const res = await fetch("/api/students");
+            const data = await res.json();
+            setStudents(data);
+        } catch (error) {
+            console.error("Failed to fetch students", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchStudents();
+    }, []);
+
+
+    const handleAddStudent = async (newStudent: Student) => {
+        try{
+            const res = await fetch("/api/students/add", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name: newStudent.name,
+                    slot: newStudent.slot,
+                    father_name: newStudent.father_name,
+                    phone: newStudent.phone,
+                    address: newStudent.address,
+                    sheetNumber: newStudent.sheetNumber
+                }),
+            });
+
+            // Check if the response was successful
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || "Something went wrong");
+            }
+
+            const data = await res.json();
+            console.log("✅ Student added:", data);
+            await fetchStudents();
+
+            // You can also show a toast or UI message here
+        }catch (error){
+            console.error("❌ Failed to add student:", error);
+            // Optionally show user-friendly error toast/message
+        }
+
+
     }
 
   return (
@@ -39,7 +92,7 @@ const StudentManagementPageContent = () => {
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border p-6">
-            <StudentDataTable students={students} />
+            <StudentDataTable students={students} onClick={fetchStudents} isLoading={isLoading} />
           </div>
         </div>
 

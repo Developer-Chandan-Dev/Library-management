@@ -6,8 +6,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useSheetAvailability } from "@/context/SheetAvailabilityContext";
 import { Student, Sheet } from "@/types";
-import { dummyStudents } from "@/constants/data";
-
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -26,39 +34,61 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
 
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
+  }),
+  father_name: z.string().min(2,
+    {message: "Father name must be at least 2 characters.",
   }),
   phone: z.string().optional(),
   slot: z.enum(["full_time", "first_half", "last_half"], {
     error: "Please select a time slot.",
   }),
   sheetNumber: z.number(),
+  address: z.string().min(2, {
+        message: "Address must be at least 2 characters."
+  })
 });
 
 interface AddStudentFormProps {
   onAddStudent: (student: Student) => void;
+  children: React.ReactNode; // For trigger element
+  open?: boolean; // Optional controlled open state
+  onOpenChange?: (open: boolean) => void; // For controlled state
 }
 
-export function AddStudentForm({ onAddStudent }: AddStudentFormProps) {
+export function AddStudentForm({
+                                 onAddStudent,
+                                 children,
+                                 open,
+                                 onOpenChange
+                               }: AddStudentFormProps) {
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const { sheets, updateSheet } = useSheetAvailability();
   const [filteredSheets, setFilteredSheets] = React.useState<Sheet[]>([]);
   const [selectedSlot, setSelectedSlot] = React.useState<
-    "full_time" | "first_half" | "last_half"
+      "full_time" | "first_half" | "last_half"
   >();
+
+  // Handle both controlled and uncontrolled open state
+  const isOpen = open !== undefined ? open : isDialogOpen;
+  const setIsOpen = onOpenChange || setIsDialogOpen;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      father_name: "",
       phone: "",
+      slot: undefined,
+      sheetNumber: 0,
+      address: ""
     },
   });
 
-  // Filter sheets based on selected time slot
+  // Filter sheets based on a selected time slot
   React.useEffect(() => {
     const slot = form.watch("slot");
     setSelectedSlot(slot);
@@ -69,49 +99,42 @@ export function AddStudentForm({ onAddStudent }: AddStudentFormProps) {
     }
 
     const filtered = sheets.filter((sheet) => {
-      // If sheet is full, it's not available for any slot
       if (sheet.status === "full_time") return false;
-
+    console.log(slot);
       if (slot === "full_time") {
-        // Only available if completely free
         return sheet.status === "free";
       } else if (slot === "first_half") {
-        // Available if no first half is taken
-        return !sheet.firstHalfName;
+        return !sheet.firstHalfName && !sheet.fullTimeName;
       } else if (slot === "last_half") {
-        // Available if no last half is taken
-        return !sheet.lastHalfName;
+        return !sheet.lastHalfName && !sheet.fullTimeName;
       }
       return false;
     });
+    console.log(filtered);
 
     setFilteredSheets(filtered);
-
-    // Reset sheet selection when slot changes
     form.resetField("sheetNumber");
   }, [form.watch("slot"), sheets]);
 
+
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Create new student
     const newStudent: Student = {
-      id: `s${Date.now()}`,
+      // stu_id: `s${Date.now()}`,
       name: values.name,
       slot: values.slot,
       sheetNumber: values.sheetNumber,
       phone: values.phone || undefined,
+      father_name: values.father_name,
+      address: values.address
     };
 
-    // Update sheet availability
     updateSheet(values.sheetNumber, values.slot, values.name);
-
-    // Add to students
     onAddStudent(newStudent);
 
-    // Reset form
     form.reset();
     setSelectedSlot(undefined);
+    setIsOpen(false);
 
-    // Updated toast notification
     toast.success("Student Added", {
       description: `${values.name} has been successfully added.`,
     });
@@ -119,7 +142,6 @@ export function AddStudentForm({ onAddStudent }: AddStudentFormProps) {
 
   const isSheetDisabled = (sheet: Sheet) => {
     if (!selectedSlot) return true;
-
     if (sheet.status === "full_time") return true;
 
     if (selectedSlot === "full_time") {
@@ -133,139 +155,201 @@ export function AddStudentForm({ onAddStudent }: AddStudentFormProps) {
     return false;
   };
 
+  // Reset form when the dialog closes
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      form.reset();
+      setSelectedSlot(undefined);
+    }
+    setIsOpen(open);
+  };
+
   return (
-    <div className="bg-white rounded-xl shadow-sm border p-6 mb-8">
-      <h2 className="text-xl font-bold text-gray-800 mb-6">Add New Student</h2>
+      <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+        <DialogTrigger asChild>
+          {children}
+        </DialogTrigger>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Full Name *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter student's full name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Add New Student</DialogTitle>
+            <DialogDescription>
+              Fill out the form below to add a new student to the system.
+            </DialogDescription>
+          </DialogHeader>
 
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter phone number" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Optional contact information
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-            <FormField
-              control={form.control}
-              name="slot"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Time Slot *</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a time slot" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="full_time">Full Time</SelectItem>
-                      <SelectItem value="first_half">First Half</SelectItem>
-                      <SelectItem value="last_half">Last Half</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Full Name *</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter student's full name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
-            <FormField
-              control={form.control}
-              name="sheetNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Assign to Sheet *</FormLabel>
-                  <Select
-                    onValueChange={(value) => field.onChange(Number(value))}
-                    value={field.value?.toString()}
-                    disabled={!selectedSlot || filteredSheets.length === 0}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={
-                            !selectedSlot
-                              ? "Select a time slot first"
-                              : filteredSheets.length === 0
-                              ? "No available sheets"
-                              : "Select a sheet"
-                          }
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {filteredSheets.length === 0 ? (
-                        <div className="py-2 text-center text-sm text-gray-500">
-                          No available sheets for this time slot
-                        </div>
-                      ) : (
-                        filteredSheets.map((sheet) => (
-                          <SelectItem
-                            key={sheet.sheetNumber}
-                            value={sheet.sheetNumber.toString()}
-                            disabled={isSheetDisabled(sheet)}
-                          >
-                            <div className="flex justify-between items-center">
-                              <span>Sheet #{sheet.sheetNumber}</span>
-                              {isSheetDisabled(sheet) && (
-                                <span className="text-xs text-red-500 ml-2">
-                                  {sheet.status === "full_time"
-                                    ? "full_time"
-                                    : sheet.firstHalfName
-                                    ? "First half taken"
-                                    : sheet.lastHalfName
-                                    ? "Last half taken"
-                                    : ""}
-                                </span>
-                              )}
-                            </div>
-                          </SelectItem>
-                        ))
+                <FormField
+                    control={form.control}
+                    name="father_name"
+                    render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Father&apos; Name *</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Your father name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone Number</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter phone number" {...field} minLength={0} maxLength={10} />
+                          </FormControl>
+                          <FormDescription>
+                            Optional contact information
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                  <FormField
+                      control={form.control}
+                      name="address"
+                      render={({ field }) => (
+                          <FormItem>
+                              <FormLabel>Address</FormLabel>
+                              <FormControl>
+                                  <Input placeholder="Enter your address..." {...field} />
+                              </FormControl>
+                              <FormDescription>
+                                  Optional contact information
+                              </FormDescription>
+                              <FormMessage />
+                          </FormItem>
                       )}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                  />
 
-          <div className="flex justify-end">
-            <Button
-              type="submit"
-              className="bg-indigo-600 hover:bg-indigo-700 px-6 py-3"
-              disabled={form.formState.isSubmitting}
-            >
-              Add Student
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </div>
+                <FormField
+                    control={form.control}
+                    name="slot"
+                    render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Time Slot *</FormLabel>
+                          <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a time slot" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="full_time">Full Time</SelectItem>
+                              <SelectItem value="first_half">First Half</SelectItem>
+                              <SelectItem value="last_half">Last Half</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="sheetNumber"
+                    render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Assign to Sheet *</FormLabel>
+                          <Select
+                              onValueChange={(value) => field.onChange(Number(value))}
+                              value={field.value?.toString()}
+                              disabled={!selectedSlot || filteredSheets.length === 0}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue
+                                    placeholder={
+                                      !selectedSlot
+                                          ? "Select a time slot first"
+                                          : filteredSheets.length === 0
+                                              ? "No available sheets"
+                                              : "Select a sheet"
+                                    }
+                                />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {filteredSheets.length === 0 ? (
+                                  <div className="py-2 text-center text-sm text-gray-500">
+                                    No available sheets for this time slot
+                                  </div>
+                              ) : (
+                                  filteredSheets.map((sheet) => (
+                                      <SelectItem
+                                          key={sheet.sheetNumber}
+                                          value={sheet.sheetNumber.toString()}
+                                          disabled={isSheetDisabled(sheet)}
+                                      >
+                                        <div className="flex justify-between items-center">
+                                          <span>Sheet #{sheet.sheetNumber}</span>
+                                          {isSheetDisabled(sheet) && (
+                                              <span className="text-xs text-red-500 ml-2">
+                                    {sheet.status === "full_time"
+                                        ? "Full"
+                                        : sheet.firstHalfName
+                                            ? "First half taken"
+                                            : sheet.lastHalfName
+                                                ? "Last half taken"
+                                                : ""}
+                                  </span>
+                                          )}
+                                        </div>
+                                      </SelectItem>
+                                  ))
+                              )}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+              </div>
+
+              <DialogFooter>
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                    type="submit"
+                    className="bg-indigo-600 hover:bg-indigo-700"
+                    disabled={form.formState.isSubmitting}
+                >
+                  Add Student
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
   );
 }

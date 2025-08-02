@@ -8,11 +8,14 @@ export interface Reservation {
 }
 
 export type Student = {
-  id: string;
+  $id: string;
   name: string;
   slot: "full_time" | "first_half" | "last_half";
   sheetNumber: number;
   phone?: string;
+  father_name: string,
+  address: string,
+  is_active: boolean;
 };
 
 export interface Sheet {

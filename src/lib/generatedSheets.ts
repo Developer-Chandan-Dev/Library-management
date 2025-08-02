@@ -1,4 +1,7 @@
+"use server";
+
 import { dummySheets } from "@/constants/data";
+import { getSheets } from "@/lib/actions/sheets.actions";
 
 type SheetData = {
   sheetNumber: number;
@@ -8,64 +11,71 @@ type SheetData = {
   fullTimeName?: string;
 };
 
-const sheetMap = new Map<number, SheetData>();
+// ⏹️ Switch this to true for live data, false for fake
+const USE_SERVER_DATA = true;
 
-// Initialize all 60 sheets as free
-for (let i = 1; i <= 60; i++) {
-  sheetMap.set(i, {
-    sheetNumber: i,
-    status: "free",
+export const generatedSheets = async (): Promise<SheetData[]> => {
+  const sheetMap = new Map<number, SheetData>();
+
+  // Initialize all 60 sheets as free
+  for (let i = 1; i <= 60; i++) {
+    sheetMap.set(i, {
+      sheetNumber: i,
+      status: "free",
+    });
+  }
+
+  const rawSheets = USE_SERVER_DATA ? await getSheets() : dummySheets;
+
+  if (!rawSheets) return Array.from(sheetMap.values());
+
+  rawSheets.forEach((assignment: any) => {
+    const sheet = sheetMap.get(assignment.sheetNumber);
+    if (!sheet) return;
+
+    const firstHalfName =
+        USE_SERVER_DATA && assignment.firstHalfStudent
+            ? assignment.firstHalfStudent.name
+            : assignment.firstHalfName;
+
+    const lastHalfName =
+        USE_SERVER_DATA && assignment.lastHalfStudent
+            ? assignment.lastHalfStudent.name
+            : assignment.lastHalfName;
+
+    const fullTimeName =
+        USE_SERVER_DATA && assignment.fullTimeStudent
+            ? assignment.fullTimeStudent.name
+            : assignment.fullTimeName;
+
+    // 🧠 Handle status updates
+    if (assignment.status === "full_time" && !firstHalfName && !lastHalfName) {
+      sheet.status = "full";
+      sheet.fullTimeName = fullTimeName;
+      sheet.firstHalfName = undefined;
+      sheet.lastHalfName = undefined;
+    } else if (
+        assignment.status === "full_time" &&
+        firstHalfName &&
+        lastHalfName
+    ) {
+      sheet.status = "full";
+      sheet.fullTimeName = undefined;
+      sheet.firstHalfName = firstHalfName;
+      sheet.lastHalfName = lastHalfName;
+    } else if (assignment.status === "first_half") {
+      sheet.firstHalfName = firstHalfName;
+      sheet.fullTimeName = undefined;
+      sheet.status = sheet.lastHalfName ? "full" : "half";
+    } else if (assignment.status === "last_half") {
+      sheet.lastHalfName = lastHalfName;
+      sheet.fullTimeName = undefined;
+      sheet.status = sheet.firstHalfName ? "full" : "half";
+    }
+
+    console.log(assignment.sheetNumber, sheet);
+    sheetMap.set(assignment.sheetNumber, sheet);
   });
-}
 
-// Process each fake sheet assignment
-dummySheets.forEach((assignment) => {
-  const sheet = sheetMap.get(assignment.sheetNumber);
-
-  if (!sheet) return; // Skip if a sheet doesn't exist
-
-  // Process based on an assignment type
-  if (assignment.status === "full_time" && !assignment.firstHalfName && !assignment.lastHalfName) {
-    // Full time assignment
-    sheet.status = "full";
-    sheet.fullTimeName = assignment.fullTimeName;
-    // Clear any half-assignments
-    sheet.firstHalfName = undefined;
-    sheet.lastHalfName = undefined;
-  }
-  else if(assignment.status === "full_time" && assignment.firstHalfName && assignment.lastHalfName) {
-  //   Full time assignment
-    sheet.status = "full";
-    sheet.fullTimeName= undefined;
-    sheet.firstHalfName = assignment.firstHalfName;
-    sheet.lastHalfName = assignment.lastHalfName;
-  }
-  else if (assignment.status === "first_half") {
-    // First half assignment
-    sheet.firstHalfName = assignment.firstHalfName;
-    sheet.fullTimeName = undefined; // Clear full time if exists
-
-    // Update status based on another half
-    if (sheet.lastHalfName) {
-      sheet.status = "full";
-    } else {
-      sheet.status = "half";
-    }
-  }
-  else if (assignment.status === "last_half") {
-    // Last half assignment
-    sheet.lastHalfName = assignment.lastHalfName;
-    sheet.fullTimeName = undefined; // Clear full time if exists
-
-    // Update status based on another half
-    if (sheet.firstHalfName) {
-      sheet.status = "full";
-    } else {
-      sheet.status = "half";
-    }
-  }
-
-  sheetMap.set(assignment.sheetNumber, sheet);
-});
-
-export const generatedSheets = Array.from(sheetMap.values());
+  return Array.from(sheetMap.values());
+};

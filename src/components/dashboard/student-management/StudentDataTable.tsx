@@ -12,7 +12,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ChevronDown } from "lucide-react"
+import {ChevronDown, RefreshCcwIcon} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -40,7 +40,7 @@ interface StudentDataTableProps {
   students: Student[]
 }
 
-export function StudentDataTable({ students }: StudentDataTableProps) {
+export function StudentDataTable({ students, onClick, isLoading }: {StudentDataTableProps, onClick: void, isLoading: boolean}) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -112,7 +112,11 @@ export function StudentDataTable({ students }: StudentDataTableProps) {
           }}
           className="max-w-[150px]"
         />
-
+        <Button variant={"outline"} className={"text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"}
+        onClick={onClick}>
+          <RefreshCcwIcon/>
+          Refresh
+        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -161,35 +165,49 @@ export function StudentDataTable({ students }: StudentDataTableProps) {
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="hover:bg-gray-50"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+          {isLoading &&
+              <TableBody>
+                <TableRow>
+                  <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                  >
+                    Loading...
+                  </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No students found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
+              </TableBody>}
+          {
+            !isLoading && <TableBody>
+                {table.getRowModel().rows?.length ? (
+                    table.getRowModel().rows.map((row) => (
+                        <TableRow
+                            key={row.id}
+                            data-state={row.getIsSelected() && "selected"}
+                            className="hover:bg-gray-50"
+                        >
+                          {row.getVisibleCells().map((cell) => (
+                              <TableCell key={cell.id}>
+                                {flexRender(
+                                    cell.column.columnDef.cell,
+                                    cell.getContext()
+                                )}
+                              </TableCell>
+                          ))}
+                        </TableRow>
+                    ))
+                ) : (
+                    <TableRow>
+                      <TableCell
+                          colSpan={columns.length}
+                          className="h-24 text-center"
+                      >
+                        No students found.
+                      </TableCell>
+                    </TableRow>
+                )}
+              </TableBody>
+          }
+
         </Table>
       </div>
       
