@@ -8,10 +8,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {Student} from "@/types";
+import {EditStudentDialog} from "@/components/dashboard/student-management/EditStudentDialog";
 
 export const columns: ColumnDef<Student>[] = [
   {
@@ -63,7 +63,7 @@ export const columns: ColumnDef<Student>[] = [
     cell: ({ row }) => {
       const sheet = row.getValue("sheetNumber");
       return sheet ? (
-        <span className="font-mono font-bold text-indigo-600">#{sheet}</span>
+        <span className="font-mono font-bold text-indigo-600">#{Number(sheet)}</span>
       ) : (
         <span className="text-gray-400 italic">None</span>
       );
@@ -92,30 +92,33 @@ export const columns: ColumnDef<Student>[] = [
     id: "actions",
     cell: ({ row }) => {
       const student = row.original;
-
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(student.id)}
-            >
-              Copy student ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Edit Student</DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600 focus:text-red-700">
-              Remove Student
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(JSON.stringify(student.$id))}>
+                Copy ID
+              </DropdownMenuItem>
+              <EditStudentDialog
+                  student={student}
+                  onStudentUpdated={(updatedStudent) => {
+                    // Handle update in your data table
+                    console.log("Updated student:", updatedStudent);
+                  }}
+              />
+              <DropdownMenuItem className="text-red-600">
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
       );
     },
   },
 ];
+
+// const

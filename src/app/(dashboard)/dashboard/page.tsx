@@ -4,13 +4,41 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SheetStatusChart } from "@/components/dashboard/SheetStatusChart";
+import {DashboardCard} from "@/components/dashboard/DashboardCard";
+import {useEffect, useState} from "react";
+
+interface SheetStats {
+  total: number;
+  free: number;
+  full: number;
+  half: number;
+}
 
 const Dashboard = () => {
+  const [stats, setStats] = useState<SheetStats | null>(null);
+  const [loading, setLoading] = useState(true);
   // Dummy Data - Replace with Appwrite calls later
   const totalSheets = 60;
   const freeSheets = 20;
   const fullyOccupiedSheets = 25;
   const halfOccupiedSheets = 15; // Combines first/last half for simplicity in display
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch("/api/dashboard/sheet-stats");
+        const data: SheetStats = await res.json();
+        console.log("Sheet data", data);
+        setStats(data);
+      } catch (error) {
+        console.error("Failed to load sheet stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   // Dummy data for the chart, now including colors
   const chartData = [
@@ -26,7 +54,7 @@ const Dashboard = () => {
       {/* Quick Links */}
       <div className="mb-6 flex gap-4">
         <Button asChild>
-          <Link href="/dashboard/add-student">➕ Add Student</Link>
+          <Link href="/dashboard/students">➕ Add Student</Link>
         </Button>
         <Button variant="outline" asChild>
           <Link href="/dashboard/sheets">📚 View All Sheets</Link>
@@ -35,10 +63,10 @@ const Dashboard = () => {
 
       {/* Sheet Status Cards */}
       <div className="mb-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <DashboardCard title="Total Sheets" value={totalSheets} />
-        <DashboardCard title="Free Sheets" value={freeSheets} />
-        <DashboardCard title="Fully Occupied" value={fullyOccupiedSheets} />
-        <DashboardCard title="Half Occupied" value={halfOccupiedSheets} />
+        <DashboardCard title="Total Sheets" loading={loading} value={stats?.total} />
+        <DashboardCard title="Free Sheets"  loading={loading} value={stats?.free} />
+        <DashboardCard title="Fully Occupied" loading={loading} value={stats?.full} />
+        <DashboardCard title="Half Occupied" loading={loading} value={stats?.half} />
       </div>
 
       {/* Chart and Filters */}
@@ -70,24 +98,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-// You'll likely put this in its own file: components/DashboardCard.tsx
-interface DashboardCardProps {
-  title: string;
-  value: number;
-}
-
-function DashboardCard({ title, value }: DashboardCardProps) {
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        {/* Icon can go here */}
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
-        {/* Optional: <p className="text-xs text-muted-foreground">+20.1% from last month</p> */}
-      </CardContent>
-    </Card>
-  );
-}

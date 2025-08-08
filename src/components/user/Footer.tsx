@@ -3,14 +3,14 @@ import { ModeToggle } from "../ui/ModeToggle";
 const Footer = () => {
   return (
     <footer className="text-gray-600 body-font w-full border-t border-b border-neutral-200 ">
-      <div className="container px-5 py-4 mx-auto flex items-center sm:flex-row flex-col">
+      <div className="container px-5 py-4 mx-auto flex items-center sm:flex-row flex-col gap-3">
         <a className="flex title-font font-medium items-center md:justify-start justify-center text-gray-900 gap-2">
           <div className="size-7 rounded-full bg-gradient-to-br from-violet-500 to-pink-500" />
           <span className="text-base font-bold md:text-2xl">
             Digital Library
           </span>
         </a>
-        <p className="text-sm text-gray-500 sm:ml-4 sm:pl-4 sm:border-l-2 sm:border-gray-200 sm:py-2 sm:mt-0 mt-4">
+        <p className="text-sm text-gray-500 sm:ml-4 sm:pl-4 sm:border-l-2 sm:border-gray-200 sm:py-2 ">
           © 2025 Digital Library —
           <a
             href="https://github.com/Developer-Chandan-Dev"
@@ -21,7 +21,7 @@ const Footer = () => {
             Developed by Chandan Dev
           </a>
         </p>
-        <span className="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start">
+        <span className="inline-flex sm:ml-auto justify-center sm:justify-start mr-4">
           <a className="text-gray-500">
             <svg
               fill="currentColor"

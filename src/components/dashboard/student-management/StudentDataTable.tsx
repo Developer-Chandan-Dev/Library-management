@@ -37,10 +37,12 @@ import {Student} from "@/types";
 
 
 interface StudentDataTableProps {
-  students: Student[]
+  students: Student[],
+  onClick: () => void,
+  isLoading: boolean,
 }
 
-export function StudentDataTable({ students, onClick, isLoading }: {StudentDataTableProps, onClick: void, isLoading: boolean}) {
+export function StudentDataTable({ students, onClick, isLoading }: StudentDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -113,7 +115,8 @@ export function StudentDataTable({ students, onClick, isLoading }: {StudentDataT
           className="max-w-[150px]"
         />
         <Button variant={"outline"} className={"text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"}
-        onClick={onClick}>
+          onClick={onClick}
+        >
           <RefreshCcwIcon/>
           Refresh
         </Button>

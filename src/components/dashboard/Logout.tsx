@@ -1,7 +1,7 @@
 "use client";
-import { account } from "@/lib/appwrite";
 import { useRouter } from "next/navigation";
 import React from "react";
+import {signOutUser} from "@/lib/actions/user.actions";
 
 const Logout = () => {
   const router = useRouter();
@@ -9,7 +9,7 @@ const Logout = () => {
   return (
     <button
       onClick={async () => {
-        await account.deleteSession("current");
+        await signOutUser();
         router.push("/login");
       }}
     >

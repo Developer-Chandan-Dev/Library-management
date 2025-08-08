@@ -7,7 +7,6 @@ import {
   IconSettings,
   IconTableFilled,
   IconUsersGroup,
-  IconUserPlus,
 } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import {getCurrentUser, signOutUser} from "@/lib/actions/user.actions";
@@ -38,13 +37,6 @@ export function SidebarDemo() {
       ),
     },
     {
-      label: "Add Student",
-      href: "add-student",
-      icon: (
-        <IconUserPlus className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
-      ),
-    },
-    {
       label: "Settings",
       href: "settings",
       icon: (
@@ -54,18 +46,18 @@ export function SidebarDemo() {
   ];
 
   const [open, setOpen] = useState(false);
-  const [id, setId] = React.useState("");
+  // const [id, setId] = React.useState("");
   const [name, setName] = React.useState("");
-  const [email, setEmail] = React.useState("");
+  // const [email, setEmail] = React.useState("");
   const [avatar, setAvatar] = React.useState("");
 
   useEffect(() => {
     (async function(){
       const user = await getCurrentUser();
       if(user){
-        setId(user.$id);
+        // setId(user.$id);
         setName(user.fullName);
-        setEmail(user.email);
+        // setEmail(user.email);
         setAvatar(user.avatar);
       }
     })();

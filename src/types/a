@@ -1,0 +1,33 @@
+  const updateSheet = React.useCallback(
+    (
+      sheetNumber: number,
+      slot: "full_time" | "first_half" | "last_half",
+      name: string
+    ) => {
+      setSheets((prev) =>
+        prev.map((sheet) => {
+          if (sheet.sheetNumber === sheetNumber) {
+            if (slot === "full_time") {
+              return { ...sheet, status: "full_time", fullTimeName: name };
+            } else if (slot === "first_half") {
+              // If the lastHalfName exists, set the status to "full_time", else "first_half"
+              return {
+                ...sheet,
+                status: sheet.lastHalfName ? "full_time" : "first_half",
+                firstHalfName: name,
+              };
+            } else if (slot === "last_half") {
+              // If the firstHalfName exists, set the status to "full_time", else "last_half"
+              return {
+                ...sheet,
+                status: sheet.firstHalfName ? "full_time" : "last_half",
+                lastHalfName: name,
+              };
+            }
+          }
+          return sheet;
+        })
+      );
+    },
+    []
+  );

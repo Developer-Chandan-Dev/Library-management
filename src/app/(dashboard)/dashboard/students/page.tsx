@@ -4,14 +4,11 @@ import { Button } from '@/components/ui/button'
 import React, {useEffect, useState} from 'react'
 import {AddStudentForm} from "@/components/dashboard/student-management/AddStudentForm";
 import {Student} from "@/types";
-import {dummyStudents} from "@/constants/data";
 import {SheetAvailabilityProvider} from "@/context/SheetAvailabilityContext";
-import {addNewStudent, getAllStudents} from "@/lib/actions/students.action";
 
 const StudentManagementPageContent = () => {
     const [students, setStudents] = useState<Student[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    // const { sheets } = useSheetAvailability()
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 
@@ -29,11 +26,12 @@ const StudentManagementPageContent = () => {
     };
 
     useEffect(() => {
-        fetchStudents();
+        fetchStudents().then(r => console.log(r, 29, "Students"));
     }, []);
 
 
     const handleAddStudent = async (newStudent: Student) => {
+
         try{
             const res = await fetch("/api/students/add", {
                 method: "POST",
@@ -61,9 +59,11 @@ const StudentManagementPageContent = () => {
             await fetchStudents();
 
             // You can also show a toast or UI message here
+            return true;
         }catch (error){
             console.error("❌ Failed to add student:", error);
             // Optionally show user-friendly error toast/message
+            return false;
         }
 
 
@@ -79,16 +79,16 @@ const StudentManagementPageContent = () => {
                 View, search, and manage student records
               </p>
             </div>
-
-              <AddStudentForm
-                  onAddStudent={handleAddStudent}
-                  open={isDialogOpen}
-                  onOpenChange={setIsDialogOpen}
-              >
-                  <Button className="bg-indigo-600 hover:bg-indigo-700">
-                      Add New Student
-                  </Button>
-              </AddStudentForm>
+          <AddStudentForm
+              mode="add"
+              onSave={(student) => handleAddStudent(student)}
+              open={isDialogOpen}
+              onOpenChange={setIsDialogOpen}
+          >
+              <Button className="bg-indigo-600 hover:bg-indigo-700">
+                  Add New Student
+              </Button>
+          </AddStudentForm>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border p-6">

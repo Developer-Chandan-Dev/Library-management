@@ -3,8 +3,23 @@
 import { motion } from "motion/react";
 import Navbar from "./Navbar";
 import Image from "next/image";
+import {getCurrentUser} from "@/lib/actions/user.actions";
+import {useState, useEffect} from "react";
+import { type User } from '@/types'
 
 export function HeroSection() {
+    const [user, setUser] = useState<User>();
+
+    useEffect(() => {
+        (async()=>{
+            const user = await getCurrentUser();
+            console.log("User:",user);
+            if (user){
+                setUser(user);
+            }
+        })();
+    }, []);
+    console.log("User :", user);
   return (
     <div>
       <Navbar />

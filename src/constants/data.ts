@@ -1,6 +1,5 @@
 import { Sheet, Student } from "@/types";
 
-// @ts-ignore
 export const dummyStudents: Student[] = [
   {
     "$id": "s1",
@@ -9,6 +8,7 @@ export const dummyStudents: Student[] = [
     sheetNumber: 1,
     phone: '+1 (555) 123-4567',
     father_name: 'Rakesh Sharma',
+    address: "Barna, Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -18,6 +18,7 @@ export const dummyStudents: Student[] = [
     sheetNumber: 2,
     phone: "+1 (555) 987-6543",
     father_name: 'Jitesh Verma',
+    address: "Latif Pur, Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -26,6 +27,7 @@ export const dummyStudents: Student[] = [
     slot: "last_half",
     sheetNumber: 2,
     father_name: 'Shubham Mehta',
+    address: "Barna, Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -35,6 +37,7 @@ export const dummyStudents: Student[] = [
     sheetNumber: 3,
     phone: "+1 (555) 246-8101",
     father_name: 'Jitesh Gupta',
+    address: "Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -43,6 +46,7 @@ export const dummyStudents: Student[] = [
     slot: "first_half",
     sheetNumber: 4,
     father_name: 'Rajesh Singh',
+    address: "Barna, Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -52,6 +56,7 @@ export const dummyStudents: Student[] = [
     sheetNumber: 4,
     phone: "+1 (555) 369-1214",
     father_name: 'Shubham Tiwari',
+    address: "Latif Pur, Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -60,6 +65,7 @@ export const dummyStudents: Student[] = [
     slot: "first_half",
     sheetNumber: 5,
     father_name: 'Sagar Yadav',
+    address: "Barna, Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -69,6 +75,7 @@ export const dummyStudents: Student[] = [
     sheetNumber: 6,
     phone: "+1 (555) 481-6325",
     father_name: 'Shubham Chauhan',
+    address: "Barna, Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -78,6 +85,7 @@ export const dummyStudents: Student[] = [
     sheetNumber: 5,
     phone: "+1 (555) 481-6325",
     father_name: 'Dinesh Kumar',
+    address: "Barna, Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -87,6 +95,7 @@ export const dummyStudents: Student[] = [
     sheetNumber: 7,
     phone: "+1 (555) 481-6325",
     father_name: 'Salman Khan',
+    address: "Barna, Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -96,6 +105,7 @@ export const dummyStudents: Student[] = [
     sheetNumber: 8,
     phone: "+91 9876543210",
     father_name: 'Mahesh Sharma',
+    address: "Barna, Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -105,6 +115,7 @@ export const dummyStudents: Student[] = [
     sheetNumber: 9,
     phone: "+91 9123456780",
     father_name: 'Yash Joshi',
+    address: "Barna, Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -114,6 +125,7 @@ export const dummyStudents: Student[] = [
     sheetNumber: 9,
     phone: "+91 9988776655",
     father_name: 'Rakesh Verma',
+    address: "Barna, Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -122,6 +134,7 @@ export const dummyStudents: Student[] = [
     slot: "first_half",
     sheetNumber: 10,
     father_name: 'Rajesh Tiwari',
+    address: "Barna, Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -130,6 +143,7 @@ export const dummyStudents: Student[] = [
     slot: "last_half",
     sheetNumber: 10,
     father_name: 'Kuldeep Yadav',
+    address: "Barna, Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -138,6 +152,7 @@ export const dummyStudents: Student[] = [
     slot: "full_time",
     sheetNumber: 11,
     father_name: 'Shaym Singh',
+    address: "Barna, Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -146,6 +161,7 @@ export const dummyStudents: Student[] = [
     slot: "first_half",
     sheetNumber: 12,
     father_name: 'Shiva Patel',
+    address: "Barna, Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -154,6 +170,7 @@ export const dummyStudents: Student[] = [
     slot: "last_half",
     sheetNumber: 12,
     father_name: 'Arjun Kumar Gupta',
+    address: "Barna, Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -162,6 +179,7 @@ export const dummyStudents: Student[] = [
     slot: "full_time",
     sheetNumber: 13,
     father_name: 'Shivam Jain',
+    address: "Barna, Phulpur, Prayagraj",
     is_active: true,
   },
   {
@@ -170,53 +188,54 @@ export const dummyStudents: Student[] = [
     slot: "first_half",
     sheetNumber: 14,
     father_name: 'Shobhit Agarwal',
+    address: "Barna, Phulpur, Prayagraj",
     is_active: true,
   },
 ];
 
 export const dummySheets: Sheet[] = [
-  { sheetNumber: 1, status: "full_time", fullTimeName: "Ankit Sharma" },
+  { sheetNumber: 1, status: "full", fullTimeName: "Ankit Sharma" },
   {
     sheetNumber: 2,
-    status: "full_time",
+    status: "full",
     firstHalfName: "Riya Verma",
     lastHalfName: "Karan Mehta",
   },
-  { sheetNumber: 3, status: "full_time", fullTimeName: "Neha Gupta" },
+  { sheetNumber: 3, status: "full", fullTimeName: "Neha Gupta" },
   {
     sheetNumber: 4,
-    status: "full_time",
+    status: "full",
     firstHalfName: "Amit Singh",
     lastHalfName: "Priya Tiwari",
   },
   {
     sheetNumber: 5,
-    status: "full_time",
+    status: "full",
     firstHalfName: "Rohit Yadav",
     lastHalfName: "Deepak Kumar",
   },
-  { sheetNumber: 6, status: "full_time", fullTimeName: "Sneha Chauhan" },
-  { sheetNumber: 7, status: "first_half", firstHalfName: "Ayesha Khan" },
-  { sheetNumber: 8, status: "full_time", fullTimeName: "Ravi Sharma" },
+  { sheetNumber: 6, status: "full", fullTimeName: "Sneha Chauhan" },
+  { sheetNumber: 7, status: "half", firstHalfName: "Ayesha Khan" },
+  { sheetNumber: 8, status: "full", fullTimeName: "Ravi Sharma" },
   {
     sheetNumber: 9,
-    status: "full_time",
+    status: "full",
     firstHalfName: "Meena Joshi",
     lastHalfName: "Arjun Verma",
   },
   {
     sheetNumber: 10,
-    status: "full_time",
+    status: "full",
     firstHalfName: "Sneha Rani",
     lastHalfName: "Deepak Yadav",
   },
-  { sheetNumber: 11, status: "full_time", fullTimeName: "Alok Singh" },
+  { sheetNumber: 11, status: "full", fullTimeName: "Alok Singh" },
   {
     sheetNumber: 12,
-    status: "full_time",
+    status: "full",
     firstHalfName: "Nidhi Patel",
     lastHalfName: "Anshul Gupta",
   },
-  { sheetNumber: 13, status: "full_time", fullTimeName: "Ritika Jain" },
-  { sheetNumber: 14, status: "first_half", firstHalfName: "Mohit Agarwal" },
+  { sheetNumber: 13, status: "full", fullTimeName: "Ritika Jain" },
+  { sheetNumber: 14, status: "half", firstHalfName: "Mohit Agarwal" },
 ];
