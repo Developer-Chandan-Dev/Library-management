@@ -114,7 +114,7 @@ export function StudentDataTable({ students, onClick, isLoading }: StudentDataTa
           }}
           className="max-w-[150px]"
         />
-        <Button variant={"outline"} className={"text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"}
+        <Button variant={"outline"} className={"text-muted-foreground hover:text-foreground transition-colors cursor-pointer"}
           onClick={onClick}
         >
           <RefreshCcwIcon/>
@@ -150,7 +150,7 @@ export function StudentDataTable({ students, onClick, isLoading }: StudentDataTa
       
       <div className="rounded-md border">
         <Table>
-          <TableHeader className="bg-gray-50">
+          <TableHeader className="bg-muted/50">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -186,7 +186,7 @@ export function StudentDataTable({ students, onClick, isLoading }: StudentDataTa
                         <TableRow
                             key={row.id}
                             data-state={row.getIsSelected() && "selected"}
-                            className="hover:bg-gray-50"
+                            className="hover:bg-muted/50"
                         >
                           {row.getVisibleCells().map((cell) => (
                               <TableCell key={cell.id}>

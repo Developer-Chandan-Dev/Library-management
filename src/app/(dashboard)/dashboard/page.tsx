@@ -4,8 +4,9 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SheetStatusChart } from "@/components/dashboard/SheetStatusChart";
-import {DashboardCard} from "@/components/dashboard/DashboardCard";
-import {useEffect, useState} from "react";
+import { DashboardCard } from "@/components/dashboard/DashboardCard";
+import { useEffect, useState } from "react";
+import { ClipboardCheck, DivideCircle, FilePlus2, Layers } from "lucide-react";
 
 interface SheetStats {
   total: number;
@@ -42,9 +43,9 @@ const Dashboard = () => {
 
   // Dummy data for the chart, now including colors
   const chartData = [
-    { name: "Free Sheets", value: freeSheets, color: "#82ca9d" },
-    { name: "Fully Occupied", value: fullyOccupiedSheets, color: "#ffc658" },
-    { name: "Half Occupied", value: halfOccupiedSheets, color: "#8884d8" },
+    { name: "Free Sheets", value: stats?.free, color: "#82ca9d" },
+    { name: "Fully Occupied", value: stats?.full, color: "#ffc658" },
+    { name: "Half Occupied", value: stats?.half, color: "#8884d8" },
   ];
 
   return (
@@ -63,10 +64,40 @@ const Dashboard = () => {
 
       {/* Sheet Status Cards */}
       <div className="mb-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <DashboardCard title="Total Sheets" loading={loading} value={stats?.total} />
-        <DashboardCard title="Free Sheets"  loading={loading} value={stats?.free} />
-        <DashboardCard title="Fully Occupied" loading={loading} value={stats?.full} />
-        <DashboardCard title="Half Occupied" loading={loading} value={stats?.half} />
+        <DashboardCard
+          title="Total Sheets"
+          loading={loading}
+          value={stats?.total}
+          icon={<Layers className="h-4 w-4 text-blue-600 dark:text-blue-300" />}
+          className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30"
+        />
+        <DashboardCard
+          title="Free Sheets"
+          loading={loading}
+          value={stats?.free}
+          icon={
+            <ClipboardCheck className="h-4 w-4 text-green-600 dark:text-green-300" />
+          }
+          className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30"
+        />
+        <DashboardCard
+          title="Fully Occupied"
+          loading={loading}
+          value={stats?.full}
+          icon={
+            <DivideCircle className="h-4 w-4 text-amber-600 dark:text-amber-300" />
+          }
+          className="bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30"
+        />
+        <DashboardCard
+          title="Half Occupied"
+          loading={loading}
+          value={stats?.half}
+          icon={
+            <FilePlus2 className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+          }
+          className="bg-gradient-to-br from-gray-50 to-slate-100 dark:from-gray-800/30 dark:to-slate-800/30"
+        />
       </div>
 
       {/* Chart and Filters */}

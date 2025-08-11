@@ -43,7 +43,7 @@ export function SheetCard({
                 {status === "full" && (
                     <>
                         {fullTimeName ? (
-                            <div className="sm:flex items-center space-x-4 rounded-md border p-2 sm:p-4 bg-green-50 transition-colors hover:bg-green-100">
+                            <div className="sm:flex items-center space-x-4 rounded-md border p-2 sm:p-4 bg-green-50 transition-colors hover:bg-green-100 dark:bg-transparent ">
                                 <div className="text-xl sm:text-2xl max-sm:mb-2">👤</div>
                                 <div className="flex-1 space-y-1">
                                     <p className="text-[12px] sm:text-sm font-medium leading-none">Full Time</p>
@@ -54,7 +54,7 @@ export function SheetCard({
                             </div>
                         ) : (
                             <>
-                                <div className="sm:flex items-center space-x-4 rounded-md border p-4 bg-amber-50 transition-colors hover:bg-amber-100">
+                                <div className="sm:flex items-center space-x-4 rounded-md border p-4 bg-amber-50 transition-colors hover:bg-amber-100 dark:bg-transparent">
                                     <div className="text-xl sm:text-2xl max-sm:mb-2">🌅</div>
                                     <div className="flex-1 space-y-1">
                                         <p className="text-[12px] sm:text-sm font-medium leading-none">First Half</p>
@@ -63,7 +63,7 @@ export function SheetCard({
                                         </p>
                                     </div>
                                 </div>
-                                <div className="sm:flex items-center space-x-4 rounded-md border p-4 bg-purple-50 transition-colors hover:bg-purple-100">
+                                <div className="sm:flex items-center space-x-4 rounded-md border p-4 bg-purple-50 transition-colors hover:bg-purple-100 dark:bg-transparent">
                                     <div className="text-xl sm:text-2xl max-sm:mb-2">🌇</div>
                                     <div className="flex-1 space-y-1">
                                         <p className="text-[12px] sm:text-sm font-medium leading-none">Last Half</p>

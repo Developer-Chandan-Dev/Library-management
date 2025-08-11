@@ -1,6 +1,6 @@
 "use server";
 
-import { Student } from "@/types";
+import { Sheet, Student } from "@/types";
 import { ID, Query } from 'node-appwrite';
 import { createAdminClient } from "@/lib/appwrite";
 import { appwriteConfig } from "@/lib/appwrite/config";
@@ -20,6 +20,14 @@ interface StudentDocument extends Student {
     $id: string;
     photo_url: string;
     join_date: string;
+}
+
+
+interface StudentDocument {
+  $id: string;
+  name: string;
+  slot: "full_time" | "first_half" | "last_half";
+  sheetNumber: number;
 }
 
 const getAllStudents = async (): Promise<StudentDocument[] | []> => {
@@ -141,117 +149,97 @@ const updateStudent = async (
     try {
         const { databases } = await createAdminClient();
 
-        const sheetChanged = sheetNumber !== previousSheetNumber;
-        const slotChanged = slot !== previousSlot;
+        // Helper function to clear previous slot assignment
+        const clearPreviousSlot = async () => {
+            if (!previousSheetNumber || !previousSlot) return;
 
-        if (sheetChanged) {
-            if (previousSheetNumber) {
-                const prevSheetRes = await databases.listDocuments(
-                    appwriteConfig.databaseId,
-                    appwriteConfig.sheetsCollectionId,
-                    [Query.equal("sheetNumber", previousSheetNumber)]
-                );
+            const prevSheetRes = await databases.listDocuments(
+                appwriteConfig.databaseId,
+                appwriteConfig.sheetsCollectionId,
+                [Query.equal("sheetNumber", previousSheetNumber)]
+            );
 
-                if (prevSheetRes.documents.length > 0) {
-                    const prevSheet = prevSheetRes.documents[0] as unknown as SheetDocument;
-                    const prevSheetUpdate: Partial<SheetDocument> = {};
+            if (prevSheetRes.documents.length === 0) return;
 
-                    if (previousSlot === "full_time") {
-                        prevSheetUpdate.fullTimeName = null;
-                        prevSheetUpdate.status = prevSheet.firstHalfName || prevSheet.lastHalfName
-                            ? "half"
-                            : "free";
-                    } else if (previousSlot === "first_half") {
-                        prevSheetUpdate.firstHalfName = null;
-                        prevSheetUpdate.status = prevSheet.lastHalfName ? "last_half" : "free";
-                    } else if (previousSlot === "last_half") {
-                        prevSheetUpdate.lastHalfName = null;
-                        prevSheetUpdate.status = prevSheet.firstHalfName ? "first_half" : "free";
-                    }
+            const prevSheet = prevSheetRes.documents[0];
+            const prevSheetUpdate: Partial<Sheet> = {};
 
-                    await databases.updateDocument(
-                        appwriteConfig.databaseId,
-                        appwriteConfig.sheetsCollectionId,
-                        prevSheet.$id,
-                        prevSheetUpdate
-                    );
-                }
+            switch (previousSlot) {
+                case "full_time":
+                    prevSheetUpdate.fullTimeName = undefined;
+                    prevSheetUpdate.status = prevSheet.firstHalfName || prevSheet.lastHalfName 
+                        ? "half" 
+                        : "free";
+                    break;
+                case "first_half":
+                    prevSheetUpdate.firstHalfName = undefined;
+                    prevSheetUpdate.status = prevSheet.lastHalfName 
+                        ? (prevSheet.fullTimeName ? "full" : "half")
+                        : "free";
+                    break;
+                case "last_half":
+                    prevSheetUpdate.lastHalfName = undefined;
+                    prevSheetUpdate.status = prevSheet.firstHalfName 
+                        ? (prevSheet.fullTimeName ? "full" : "half")
+                        : "free";
+                    break;
             }
 
+            await databases.updateDocument(
+                appwriteConfig.databaseId,
+                appwriteConfig.sheetsCollectionId,
+                prevSheet.$id,
+                prevSheetUpdate
+            );
+        };
+
+        // Helper function to check new slot availability
+        const checkNewSlotAvailability = async () => {
             const newSheetRes = await databases.listDocuments(
                 appwriteConfig.databaseId,
                 appwriteConfig.sheetsCollectionId,
                 [Query.equal("sheetNumber", sheetNumber)]
             );
 
-            const newSheet = newSheetRes.documents[0] as unknown as SheetDocument | undefined;
+            const newSheet = newSheetRes.documents[0];
+            if (!newSheet) return true; // New sheet will be created
 
-            if (newSheet) {
-                if (slot === "full_time" && newSheet.status !== "free") {
-                    return "Sheet is already partially or fully occupied";
-                }
-                if (slot === "first_half" && newSheet.firstHalfName) {
-                    return "First half is already taken";
-                }
-                if (slot === "last_half" && newSheet.lastHalfName) {
-                    return "Last half is already taken";
-                }
-            }
-        } else if (slotChanged) {
-            if (previousSheetNumber) {
-                const prevSheetRes = await databases.listDocuments(
-                    appwriteConfig.databaseId,
-                    appwriteConfig.sheetsCollectionId,
-                    [Query.equal("sheetNumber", previousSheetNumber)]
-                );
-
-                if (prevSheetRes.documents.length > 0) {
-                    const prevSheet = prevSheetRes.documents[0] as unknown as SheetDocument;
-                    const prevSheetUpdate: Partial<SheetDocument> = {};
-
-                    if (previousSlot === "full_time") {
-                        prevSheetUpdate.fullTimeName = null;
-                        prevSheetUpdate.status = prevSheet.firstHalfName || prevSheet.lastHalfName
-                            ? "half"
-                            : "free";
-                    } else if (previousSlot === "first_half") {
-                        prevSheetUpdate.firstHalfName = null;
-                        prevSheetUpdate.status = prevSheet.lastHalfName ? "last_half" : "free";
-                    } else if (previousSlot === "last_half") {
-                        prevSheetUpdate.lastHalfName = null;
-                        prevSheetUpdate.status = prevSheet.firstHalfName ? "first_half" : "free";
+            switch (slot) {
+                case "full_time":
+                    if (newSheet.status !== "free") {
+                        return "Sheet is already partially or fully occupied";
                     }
-
-                    await databases.updateDocument(
-                        appwriteConfig.databaseId,
-                        appwriteConfig.sheetsCollectionId,
-                        prevSheet.$id,
-                        prevSheetUpdate
-                    );
-                }
+                    break;
+                case "first_half":
+                    if (newSheet.firstHalfName) {
+                        return "First half is already taken";
+                    }
+                    break;
+                case "last_half":
+                    if (newSheet.lastHalfName) {
+                        return "Last half is already taken";
+                    }
+                    break;
             }
+            return true;
+        };
 
-            const newSheetRes = await databases.listDocuments(
-                appwriteConfig.databaseId,
-                appwriteConfig.sheetsCollectionId,
-                [Query.equal("sheetNumber", sheetNumber)]
-            );
+        // Check if we need to update sheets
+        const needsSheetUpdate = (
+            sheetNumber !== previousSheetNumber || 
+            slot !== previousSlot
+        );
 
-            const newSheet = newSheetRes.documents[0] as unknown as SheetDocument | undefined;
+        if (needsSheetUpdate) {
+            // Clear previous assignment if exists
+            await clearPreviousSlot();
 
-            if (newSheet) {
-                if (slot === "full_time" && newSheet.status !== "free") {
-                    return "Sheet is already partially or fully occupied";
-                }
-                if (slot === "first_half" && newSheet.firstHalfName) {
-                    return "First half is already taken";
-                }
-                if (slot === "last_half" && newSheet.lastHalfName) {
-                    return "Last half is already taken";
-                }
-            }
+            // Check new slot availability
+            const availability = await checkNewSlotAvailability();
+            if (typeof availability === "string") return availability;
         }
 
+        // Update student document
         const updatedStudent = await databases.updateDocument(
             appwriteConfig.databaseId,
             appwriteConfig.studentsCollectionId,
@@ -264,53 +252,161 @@ const updateStudent = async (
                 address,
                 sheetNumber
             }
-        ) as unknown as StudentDocument;
-
-        const sheetRes = await databases.listDocuments(
-            appwriteConfig.databaseId,
-            appwriteConfig.sheetsCollectionId,
-            [Query.equal("sheetNumber", sheetNumber)]
         );
 
-        const sheetData: Partial<SheetDocument> = {
-            sheetNumber,
-            is_active: true
-        };
-
-        if (slot === "full_time") {
-            sheetData.status = "full";
-            sheetData.fullTimeName = name;
-            sheetData.firstHalfName = null;
-            sheetData.lastHalfName = null;
-        } else if (slot === "first_half") {
-            sheetData.firstHalfName = name;
-            sheetData.status = sheetRes.documents[0]?.lastHalfName ? "full" : "half";
-        } else if (slot === "last_half") {
-            sheetData.lastHalfName = name;
-            sheetData.status = sheetRes.documents[0]?.firstHalfName ? "full" : "half";
-        }
-
-        if (sheetRes.documents.length > 0) {
-            await databases.updateDocument(
+        // Update sheet assignment if needed
+        if (needsSheetUpdate) {
+            const sheetRes = await databases.listDocuments(
                 appwriteConfig.databaseId,
                 appwriteConfig.sheetsCollectionId,
-                sheetRes.documents[0].$id,
-                sheetData
+                [Query.equal("sheetNumber", sheetNumber)]
             );
-        } else {
-            await databases.createDocument(
-                appwriteConfig.databaseId,
-                appwriteConfig.sheetsCollectionId,
-                ID.unique(),
-                sheetData
-            );
+
+            const sheetData: Partial<Sheet> = {
+                sheetNumber,
+                is_active: true
+            };
+
+            switch (slot) {
+                case "full_time":
+                    sheetData.status = "full";
+                    sheetData.fullTimeName = name;
+                    sheetData.firstHalfName = undefined;
+                    sheetData.lastHalfName = undefined;
+                    break;
+                case "first_half":
+                    sheetData.firstHalfName = name;
+                    sheetData.status = sheetRes.documents[0]?.lastHalfName 
+                        ? "full" 
+                        : "half";
+                    break;
+                case "last_half":
+                    sheetData.lastHalfName = name;
+                    sheetData.status = sheetRes.documents[0]?.firstHalfName 
+                        ? "full" 
+                        : "half";
+                    break;
+            }
+
+            if (sheetRes.documents.length > 0) {
+                await databases.updateDocument(
+                    appwriteConfig.databaseId,
+                    appwriteConfig.sheetsCollectionId,
+                    sheetRes.documents[0].$id,
+                    sheetData
+                );
+            } else {
+                await databases.createDocument(
+                    appwriteConfig.databaseId,
+                    appwriteConfig.sheetsCollectionId,
+                    ID.unique(),
+                    sheetData
+                );
+            }
         }
 
-        return updatedStudent;
+        return updatedStudent as unknown as StudentDocument;
     } catch (error) {
         console.error("❌ Failed to update student:", error);
         return null;
     }
 };
 
-export { getAllStudents, addNewStudent, updateStudent };
+const deleteStudent = async (
+  studentId: string,
+  options: { softDelete?: boolean } = { softDelete: false }
+): Promise<{ success: boolean; message: string }> => {
+  try {
+    const { databases } = await createAdminClient();
+    const { softDelete } = options;
+
+    // 1. Get the student document
+    const student = await databases.getDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.studentsCollectionId,
+        studentId
+    ) as unknown as Student & { $id: string }; // Ensure $id is present
+
+    // Check if already soft-deleted
+    if (softDelete && student.is_active === false) {
+      return { success: false, message: "Student is already inactive" };
+    }
+
+    // 2. Find the associated sheet
+    const { documents: sheets } = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.sheetsCollectionId,
+      [Query.equal("sheetNumber", student.sheetNumber)]
+    );
+
+    const sheet = sheets[0] as unknown as (Sheet & { $id: string }) | undefined;
+
+    // 3. Prepare sheet updates based on student's slot
+    if (sheet) {
+      const sheetUpdate: Partial<Sheet> = { 
+        is_active: true // Maintain sheet active status
+      };
+
+      switch (student.slot) {
+        case "full_time":
+          sheetUpdate.fullTimeName = undefined;
+          sheetUpdate.status = sheet.firstHalfName || sheet.lastHalfName 
+            ? "half" 
+            : "free";
+          break;
+
+        case "first_half":
+          sheetUpdate.firstHalfName = undefined;
+          sheetUpdate.status = sheet.lastHalfName 
+            ? (sheet.fullTimeName ? "full" : "half")
+            : "free";
+          break;
+
+        case "last_half":
+          sheetUpdate.lastHalfName = undefined;
+          sheetUpdate.status = sheet.firstHalfName 
+            ? (sheet.fullTimeName ? "full" : "half")
+            : "free";
+          break;
+      }
+
+      await databases.updateDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.sheetsCollectionId,
+        sheet.$id,
+        sheetUpdate
+      );
+    }
+
+    // 4. Handle deletion based on softDelete parameter
+    if (softDelete) {
+      // Soft delete - mark as inactive
+      await databases.updateDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.studentsCollectionId,
+        studentId,
+        { is_active: false }
+      );
+      return { success: true, message: "Student deactivated successfully" };
+    } else {
+      // Hard delete - remove document
+      await databases.deleteDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.studentsCollectionId,
+        studentId
+      );
+      return { success: true, message: "Student permanently deleted" };
+    }
+
+  } catch (error) {
+    console.error("Failed to delete student:", error);
+    return { 
+      success: false, 
+      message: error instanceof Error 
+        ? error.message 
+        : "An unexpected error occurred" 
+    };
+  }
+};
+
+export { getAllStudents, addNewStudent, updateStudent, deleteStudent };

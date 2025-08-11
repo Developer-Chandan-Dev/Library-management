@@ -48,7 +48,7 @@ export function EditStudentDialog({ student, onStudentUpdated }: EditStudentDial
                     studentData={student}
                     onSave={handleSave}
                 >
-                    <Button variant="ghost" className="w-full justify-start" disabled={isLoading}>
+                    <button>
                         {isLoading ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -57,7 +57,7 @@ export function EditStudentDialog({ student, onStudentUpdated }: EditStudentDial
                         ) : (
                             "Edit Student"
                         )}
-                    </Button>
+                    </button>
                 </AddStudentForm>
             </div>
         </DropdownMenuItem>

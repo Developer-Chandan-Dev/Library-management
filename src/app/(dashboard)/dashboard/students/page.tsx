@@ -74,8 +74,8 @@ const StudentManagementPageContent = () => {
         <div className="container mx-auto py-8">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Student Management</h1>
-              <p className="text-gray-600 mt-2">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-200">Student Management</h1>
+              <p className="text-gray-600 dark:text-gray-500 mt-2">
                 View, search, and manage student records
               </p>
             </div>
@@ -91,7 +91,7 @@ const StudentManagementPageContent = () => {
           </AddStudentForm>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border p-6">
+          <div className="bg-white dark:bg-slate-700 rounded-xl shadow-sm border p-6">
             <StudentDataTable students={students} onClick={fetchStudents} isLoading={isLoading} />
           </div>
         </div>
