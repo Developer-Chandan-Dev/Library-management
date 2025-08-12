@@ -7,6 +7,9 @@ import {
   IconSettings,
   IconTableFilled,
   IconUsersGroup,
+  IconFileText,
+  IconCurrencyRupee,
+  IconCalendar,
 } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import {getCurrentUser, signOutUser} from "@/lib/actions/user.actions";
@@ -34,6 +37,34 @@ export function SidebarDemo() {
       href: "students",
       icon: (
         <IconUsersGroup className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
+      ),
+    },
+    {
+      label: "Registrations",
+      href: "registrations",
+      icon: (
+        <IconFileText className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
+      ),
+    },
+    {
+      label: "Reservations",
+      href: "reservations",
+      icon: (
+        <IconTableFilled className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
+      ),
+    },
+    {
+      label: "Payments",
+      href: "payments",
+      icon: (
+        <IconCurrencyRupee className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
+      ),
+    },
+    {
+      label: "Attendance",
+      href: "attendance",
+      icon: (
+        <IconCalendar className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
     },
     {
@@ -75,20 +106,11 @@ export function SidebarDemo() {
           </div>
         </div>
         <div>
-          <SidebarLink
-            onClick={signOutUser}
-            link={{
-              label: "Logout",
-              icon: (
-                  <IconArrowLeft
-                      className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200"
-                  />
-              ),
-            }}
-          />
+          <LogoutLink />
           <SidebarLink
             link={{
               label: name || "User name",
+              href: "#",
               icon: (
                 <Image
                   src={ avatar || "https://assets.aceternity.com/manu.png" }
@@ -105,6 +127,27 @@ export function SidebarDemo() {
     </Sidebar>
   );
 }
+
+const LogoutLink = () => {
+  return (
+    <a
+      href="#"
+      className="flex items-center justify-start gap-2 group/sidebar py-2 cursor-pointer"
+      onClick={(e) => {
+        e.preventDefault();
+        signOutUser();
+      }}
+    >
+      <IconArrowLeft className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
+      <motion.span
+        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+      >
+        Logout
+      </motion.span>
+    </a>
+  );
+};
+
 export const Logo = () => {
   return (
     <a
@@ -122,6 +165,7 @@ export const Logo = () => {
     </a>
   );
 };
+
 export const LogoIcon = () => {
   return (
     <a
