@@ -1,12 +1,12 @@
 "use client";
-import { StudentDataTable } from "@/components/dashboard/student-management/StudentDataTable";
-import React, { useEffect, useState } from "react";
-import { Student } from "@/types";
-import { SheetAvailabilityProvider } from "@/context/SheetAvailabilityContext";
-import { Button } from "@/components/ui/button";
-import { AddStudentForm } from "@/components/dashboard/student-management/AddStudentForm";
 
-const StudentManagementPageContent = () => {
+import { useState, useEffect } from "react"
+import { Student } from "@/types";
+import { DataTable } from "@/components/ui/data-table"
+
+
+const StudentManagement = ()=>{
+
   const [students, setStudents] = useState<Student[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -65,44 +65,16 @@ const StudentManagementPageContent = () => {
 
   return (
     <>
-      <div className="container mx-auto py-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-200">
-              Student Management
-            </h1>
-            <p className="text-gray-600 dark:text-gray-500 mt-2">
-              View, search, and manage student records
-            </p>
-          </div>
-          <AddStudentForm
-            mode="add"
-            onSave={(student) => handleAddStudent(student)}
-            open={isDialogOpen}
-            onOpenChange={setIsDialogOpen}
-          >
-            <Button className="bg-indigo-600 hover:bg-indigo-700">
-              Add New Student
-            </Button>
-          </AddStudentForm>
-        </div>
-
-        <div className="rounded-xl shadow-sm border p-6">
-          <StudentDataTable
-            students={students}
-            onClick={fetchStudents}
-            isLoading={isLoading}
-          />
-        </div>
-      </div>
+        <Card>
+            <CardHeader>
+                <CardTitle>Student Management </CardTitle>
+            </CardHeader>
+             <CardContent>
+                <DataTable />
+            </CardContent>
+            </Card>
     </>
-  );
-};
-
-export default function StudentManagementPage() {
-  return (
-    <SheetAvailabilityProvider>
-      <StudentManagementPageContent />
-    </SheetAvailabilityProvider>
-  );
+  )
 }
+
+export default StudentManagement;

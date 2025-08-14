@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import {
+  ColumnDef,
   ColumnFiltersState,
   SortingState,
   VisibilityState,
@@ -12,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import {ChevronDown, RefreshCcwIcon} from "lucide-react"
+import { ChevronDown, RefreshCcwIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -32,24 +33,37 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import { columns } from "./columns"
-import {Student} from "@/types";
-
-
-interface StudentDataTableProps {
-  students: Student[],
-  onClick: () => void,
-  isLoading: boolean,
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[]
+  data: TData[]
+  refreshData?: () => void
+  isLoading?: boolean
+  filterableColumns?: {
+    id: string
+    title: string
+    options: { value: string; label: string }[]
+  }[]
+  searchableColumns?: {
+    id: string
+    placeholder: string
+  }[]
 }
 
-export function StudentDataTable({ students, onClick, isLoading }: StudentDataTableProps) {
+export function DataTable<TData, TValue>({
+  columns,
+  data,
+  refreshData,
+  isLoading = false,
+  filterableColumns = [],
+  searchableColumns = [],
+}: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
-  
+
   const table = useReactTable({
-    data: students,
+    data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -70,56 +84,57 @@ export function StudentDataTable({ students, onClick, isLoading }: StudentDataTa
   return (
     <div className="w-full">
       <div className="flex flex-wrap items-center gap-4 py-4">
-        <Input
-          placeholder="Search students..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Time Slot <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {["full_time", "first_half", "last_half"].map((slot) => (
-              <DropdownMenuCheckboxItem
-                key={slot}
-                className="capitalize"
-                checked={table.getColumn("slot")?.getFilterValue() === slot}
-                onCheckedChange={(checked) => {
-                  table.getColumn("slot")?.setFilterValue(checked ? slot : undefined)
-                }}
-              >
-                {slot === "full_time" ? "Full Time" 
-                 : slot === "first_half" ? "First Half" 
-                 : "Last Half"}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        
-        {/* Fixed Sheet Number Search */}
-        <Input
-          placeholder="Sheet number..."
-          value={(table.getColumn("sheetNumber")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => {
-            const value = event.target.value;
-            // Allow partial number matching
-            table.getColumn("sheetNumber")?.setFilterValue(value);
-          }}
-          className="max-w-[150px]"
-        />
-        <Button variant={"outline"} className={"text-muted-foreground hover:text-foreground transition-colors cursor-pointer"}
-          onClick={onClick}
-        >
-          <RefreshCcwIcon/>
-          Refresh
-        </Button>
+        {/* Searchable columns */}
+        {searchableColumns.map((column) => (
+          <Input
+            key={column.id}
+            placeholder={column.placeholder}
+            value={(table.getColumn(column.id)?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn(column.id)?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+        ))}
+
+        {/* Filterable columns */}
+        {filterableColumns.map((filterableColumn) => (
+          <DropdownMenu key={filterableColumn.id}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                {filterableColumn.title} <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {filterableColumn.options.map((option) => (
+                <DropdownMenuCheckboxItem
+                  key={option.value}
+                  className="capitalize"
+                  checked={table.getColumn(filterableColumn.id)?.getFilterValue() === option.value}
+                  onCheckedChange={(checked) => {
+                    table.getColumn(filterableColumn.id)?.setFilterValue(checked ? option.value : undefined)
+                  }}
+                >
+                  {option.label}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ))}
+
+        {/* Refresh button */}
+        {refreshData && (
+          <Button 
+            variant={"outline"} 
+            className={"text-muted-foreground hover:text-foreground transition-colors cursor-pointer"}
+            onClick={refreshData}
+          >
+            <RefreshCcwIcon />
+            Refresh
+          </Button>
+        )}
+
+        {/* Column visibility */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -147,9 +162,9 @@ export function StudentDataTable({ students, onClick, isLoading }: StudentDataTa
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      
+
       <div className="rounded-md border">
-        <Table >
+        <Table>
           <TableHeader className="bg-muted/50">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -168,58 +183,58 @@ export function StudentDataTable({ students, onClick, isLoading }: StudentDataTa
               </TableRow>
             ))}
           </TableHeader>
-          {isLoading &&
-              <TableBody>
+          {isLoading && (
+            <TableBody>
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  Loading...
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          )}
+          {!isLoading && (
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    className="hover:bg-muted/50"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
                 <TableRow>
                   <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
+                    colSpan={columns.length}
+                    className="h-24 text-center"
                   >
-                    Loading...
+                    No results found.
                   </TableCell>
                 </TableRow>
-              </TableBody>}
-          {
-            !isLoading && <TableBody>
-                {table.getRowModel().rows?.length ? (
-                    table.getRowModel().rows.map((row) => (
-                        <TableRow
-                            key={row.id}
-                            data-state={row.getIsSelected() && "selected"}
-                            className="hover:bg-muted/50"
-                        >
-                          {row.getVisibleCells().map((cell) => (
-                              <TableCell key={cell.id}>
-                                {flexRender(
-                                    cell.column.columnDef.cell,
-                                    cell.getContext()
-                                )}
-                              </TableCell>
-                          ))}
-                        </TableRow>
-                    ))
-                ) : (
-                    <TableRow>
-                      <TableCell
-                          colSpan={columns.length}
-                          className="h-24 text-center"
-                      >
-                        No students found.
-                      </TableCell>
-                    </TableRow>
-                )}
-              </TableBody>
-          }
-
+              )}
+            </TableBody>
+          )}
         </Table>
       </div>
-      
+
       <div className="flex flex-col sm:flex-row items-center justify-between py-4 gap-4">
         <div className="text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} student(s) selected.
+          {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        
+
         <div className="flex items-center space-x-4">
           {/* Rows per page selector */}
           <div className="flex items-center space-x-2">
@@ -243,7 +258,13 @@ export function StudentDataTable({ students, onClick, isLoading }: StudentDataTa
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          
+
+          {/* Pagination info */}
+          <div className="text-sm text-muted-foreground">
+            Page {table.getState().pagination.pageIndex + 1} of{" "}
+            {table.getPageCount()}
+          </div>
+
           {/* Pagination buttons */}
           <div className="flex items-center space-x-2">
             <Button

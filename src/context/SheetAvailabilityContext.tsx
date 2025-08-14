@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { generatedSheets} from '@/lib/generatedSheets'
+import { generatedSheets } from "@/lib/generatedSheets";
 import { Sheet } from "@/types";
 
 interface SheetAvailabilityContextType {
@@ -33,75 +33,72 @@ export function SheetAvailabilityProvider({
         status: "free" | "half" | "full";
         firstHalfName?: string;
         lastHalfName?: string;
-        fullTimeName?: string
-      }[] = data.map(item => ({
+        fullTimeName?: string;
+      }[] = data.map((item) => ({
         ...item,
-        // any necessary conversion logic here
+        status: item.fullTimeName
+          ? "full"
+          : item.firstHalfName && item.lastHalfName
+          ? "full"
+          : item.firstHalfName || item.lastHalfName
+          ? "half"
+          : "free",
       }));
 
       setSheets(allSheets);
-
     };
-    fetchSheets().then(r => console.log(r));
+    fetchSheets().then((r) => console.log(r));
   }, []);
 
-const updateSheet = React.useCallback(
-  (
-    sheetNumber: number,
-    slot: "full_time" | "first_half" | "last_half",
-    name: string
-  ) => {
-    setSheets((prev) =>
-      prev.map((sheet) => {
-        if (sheet.sheetNumber !== sheetNumber) return sheet;
+  // Fix the updateSheet function to properly handle all cases
+  const updateSheet = React.useCallback(
+    (
+      sheetNumber: number,
+      slot: "full_time" | "first_half" | "last_half",
+      name: string
+    ) => {
+      setSheets((prev) =>
+        prev.map((sheet) => {
+          if (sheet.sheetNumber !== sheetNumber) return sheet;
 
-        // Decide the new state and names
-        if (slot === "full_time") {
-          // Marked as full, assigns to fullTimeName
+          const updatedSheet = { ...sheet };
 
-          return { ...sheet, status: "full", fullTimeName: name };
-        } else if (slot === "first_half" && sheet.status !== "full") {
-          // If lastHalfName is present, then it is full
-          if (sheet.lastHalfName) {
-            return {
-              ...sheet,
-              status: "full",
-              firstHalfName: name,
-              // Optionally, also keep fullTimeName for clarity
-              fullTimeName: `${name} & ${sheet.lastHalfName}`,
-            };
-          } else {
-            return {
-              ...sheet,
-              status: "half",
-              firstHalfName: name,
-            };
+          switch (slot) {
+            case "full_time":
+              // Full-time reservation clears both halves
+              updatedSheet.status = "full";
+              updatedSheet.fullTimeName = name;
+              updatedSheet.firstHalfName = undefined;
+              updatedSheet.lastHalfName = undefined;
+              break;
+
+            case "first_half":
+              updatedSheet.firstHalfName = name;
+              // Update status based on other half
+              if (updatedSheet.lastHalfName) {
+                updatedSheet.status = "full";
+              } else {
+                updatedSheet.status = "half";
+              }
+              break;
+
+            case "last_half":
+              updatedSheet.lastHalfName = name;
+              // Update status based on other half
+              if (updatedSheet.firstHalfName) {
+                updatedSheet.status = "full";
+              } else {
+                updatedSheet.status = "half";
+              }
+              break;
           }
-        } else if (slot === "last_half") {
-          // If firstHalfName is present, then it is full
-          if (sheet.firstHalfName) {
-            return {
-              ...sheet,
-              status: "full",
-              lastHalfName: name,
-              // Optionally, also keep fullTimeName for clarity
-              fullTimeName: `${sheet.firstHalfName} & ${name}`,
-            };
-          } else {
-            return {
-              ...sheet,
-              status: "half",
-              lastHalfName: name,
-            };
-          }
-        }
-        return sheet;
-      })
-    );
-  },
-  []
-);
 
+          return updatedSheet;
+        })
+      );
+    },
+    []
+  );
   const value = React.useMemo(
     () => ({ sheets, updateSheet }),
     [sheets, updateSheet]

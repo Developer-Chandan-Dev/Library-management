@@ -1,4 +1,5 @@
 import { SidebarDemo } from "@/components/dashboard/Sidebar";
+import { SheetAvailabilityProvider } from "@/context/SheetAvailabilityContext";
 import { cn } from "@/lib/utils";
 import React from "react";
 
@@ -15,7 +16,9 @@ const DashboardLayout = ({
       )}
     >
       <SidebarDemo />
-      <div className="h-full w-full overflow-auto">{children}</div>
+      <SheetAvailabilityProvider>
+        <div className="h-full w-full overflow-auto">{children}</div>
+      </SheetAvailabilityProvider>
     </div>
   );
 };

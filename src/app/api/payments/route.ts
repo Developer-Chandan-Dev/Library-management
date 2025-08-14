@@ -104,6 +104,7 @@ export async function PUT(req: NextRequest) {
           receiptNumber: receiptNumber || null,
         }
       );
+      console.log("Payment History: ", paymentHistory )
     }
 
     return NextResponse.json(

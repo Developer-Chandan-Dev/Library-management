@@ -1,65 +1,53 @@
 "use client";
 
-import { useState } from "react";
 import { Student } from "@/types";
 import { AddStudentForm } from "./AddStudentForm";
-import { Button } from "@/components/ui/button";
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { updateStudent } from "@/lib/actions/students.action";
-import { Loader2 } from "lucide-react";
-import {Models} from "node-appwrite";
 
 interface EditStudentDialogProps {
-    student: Student;
-    onStudentUpdated?: (student: string | Models.Document) => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  student: Student;
 }
 
-export function EditStudentDialog({ student, onStudentUpdated }: EditStudentDialogProps) {
-    const [isLoading, setIsLoading] = useState(false);
+export function EditStudentDialog({
+  student,
+  open,
+  onOpenChange,
+}: EditStudentDialogProps) {
+  // const [isLoading, setIsLoading] = useState(false);
 
-    const handleSave = async (updatedStudent: Student): Promise<boolean> => {
-        setIsLoading(true);
-        try {
-            const result = await updateStudent({
-                ...updatedStudent,
-                previousSheetNumber: student.sheetNumber,
-                previousSlot: student.slot
-            });
+  const handleSave = async (updatedStudent: Student): Promise<boolean> => {
+    // setIsLoading(true);
 
-            if (!result) throw new Error("Failed to update student");
+    try {
+      const result = await updateStudent({
+        ...updatedStudent,
+        previousSheetNumber: student.sheetNumber,
+        previousSlot: student.slot,
+      });
 
-            toast.success("Student updated successfully");
-            onStudentUpdated?.(result);
-            return true;
-        } catch (error) {
-            toast.error(error instanceof Error ? error.message : "Update failed");
-            return false;
-        } finally {
-            setIsLoading(false);
-        }
-    };
+      return result;
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Update failed");
+      return false;
+    }
+    // } finally {
+    //   setIsLoading(false);
+    // }
+  };
 
-    return (
-        <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-            <div className="w-full">
-                <AddStudentForm
-                    mode="edit"
-                    studentData={student}
-                    onSave={handleSave}
-                >
-                    <button>
-                        {isLoading ? (
-                            <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Updating...
-                            </>
-                        ) : (
-                            "Edit Student"
-                        )}
-                    </button>
-                </AddStudentForm>
-            </div>
-        </DropdownMenuItem>
-    );
+  return (
+    // When using AddStudentForm directly:
+    <AddStudentForm
+      mode="edit"
+      studentData={student}
+      onSave={handleSave}
+      open={open}
+      onOpenChange={onOpenChange}
+    >
+      <button>Edit Student</button> {/* This is the trigger */}
+    </AddStudentForm>
+  );
 }

@@ -1,168 +1,135 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { getReservations, cancelReservation } from '@/lib/actions/reservations.action';
-import { toast } from 'sonner';
-
-interface Reservation {
-  $id: string;
-  studentId: string;
-  studentName: string;
-  sheetNumber: number;
-  slot: 'full_time' | 'first_half' | 'last_half';
-  reservationDate: string;
-  startDate: string;
-  endDate?: string;
-  status: 'active' | 'completed' | 'cancelled';
-}
+import React, { useEffect, useState, useCallback } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getReservations } from "@/lib/actions/reservations.action"; // Make sure this exists
+import { toast } from "sonner";
+import { DataTable } from "@/components/ui/data-table";
+import { getColumns, Reservation } from "./columns"; // Correct import
+import ReservationForm from "./ReservationForm";
 
 const ReservationManagement = () => {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentReservation, setCurrentReservation] =
+    useState<Reservation | null>(null);
 
-  const fetchReservations = async () => {
+  // Create a stable refresh function
+  const fetchReservations = useCallback(async () => {
     try {
-      const response = await getReservations();
+      setLoading(true);
+      const response = await getReservations(); // Make sure this function exists
+
       if (response.success && response.data) {
-        // Type assertion to ensure correct type
         const docs = response.data.documents as unknown as Reservation[];
         setReservations(docs || []);
       } else {
-        toast.error(response.message || 'Failed to fetch reservations');
+        toast.error(response.message || "Failed to fetch reservations");
       }
     } catch (error) {
-      console.error('Error fetching reservations:', error);
-      toast.error('Failed to fetch reservations');
+      console.error("Error fetching reservations:", error);
+      toast.error("Failed to fetch reservations");
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCancelReservation = async (reservationId: string) => {
-    try {
-      const response = await cancelReservation(reservationId);
-      if (response.success) {
-        toast.success(response.message);
-        // Refresh the reservations list
-        fetchReservations();
-      } else {
-        toast.error(response.message || 'Failed to cancel reservation');
-      }
-    } catch (error) {
-      console.error('Error cancelling reservation:', error);
-      toast.error('Failed to cancel reservation');
-    }
-  };
+  }, []);
 
   useEffect(() => {
     fetchReservations();
-  }, []);
+  }, [fetchReservations]);
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'active':
-        return <Badge className="bg-green-500 hover:bg-green-600">Active</Badge>;
-      case 'completed':
-        return <Badge className="bg-blue-500 hover:bg-blue-600">Completed</Badge>;
-      case 'cancelled':
-        return <Badge className="bg-red-500 hover:bg-red-600">Cancelled</Badge>;
-      default:
-        return <Badge className="bg-gray-500 hover:bg-gray-600">Unknown</Badge>;
-    }
-  };
+  const handleEditClick = useCallback((reservation: Reservation) => {
+    console.log("Reservation data:", reservation);
+    setCurrentReservation(reservation);
+    setIsDialogOpen(true);
+}, []);
 
-  const getSlotBadge = (slot: string) => {
-    switch (slot) {
-      case 'full_time':
-        return <Badge className="bg-purple-500 hover:bg-purple-600">Full Time</Badge>;
-      case 'first_half':
-        return <Badge className="bg-yellow-500 hover:bg-yellow-600">First Half</Badge>;
-      case 'last_half':
-        return <Badge className="bg-orange-500 hover:bg-orange-600">Last Half</Badge>;
-      default:
-        return <Badge className="bg-gray-500 hover:bg-gray-600">Unknown</Badge>;
-    }
-  };
+  // Create columns with refreshData function
+  const columns = getColumns(fetchReservations, handleEditClick);
 
-  if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Reservations</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>Loading reservations...</p>
-        </CardContent>
-      </Card>
-    );
-  }
+  // const handleDelete = async (reservationId: string) => {
+  //   try {
+  //     const result = await deleteReservation(reservationId);
+
+  //     if (result.success) {
+  //       toast.success(result.message);
+
+  //       // Update context to reflect freed sheet
+  //       updateSheet(
+  //         reservation.sheetNumber,
+  //         reservation.slot,
+  //         "" // Empty name to clear slot
+  //       );
+
+  //       refreshData(); // Refresh your reservations list
+  //     } else {
+  //       throw new Error(result.message);
+  //     }
+  //   } catch (error) {
+  //     toast.error(error.message || "Failed to delete reservation");
+  //   }
+  // };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Sheet Reservations</CardTitle>
+        <CardTitle>Reservation Management</CardTitle>
       </CardHeader>
       <CardContent>
-        {reservations.length === 0 ? (
-          <p className="text-center py-4">No reservations found.</p>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Student Name</TableHead>
-                <TableHead>Sheet Number</TableHead>
-                <TableHead>Slot</TableHead>
-                <TableHead>Reservation Date</TableHead>
-                <TableHead>Start Date</TableHead>
-                <TableHead>End Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {reservations.map((reservation) => (
-                <TableRow key={reservation.$id}>
-                  <TableCell>{reservation.studentName}</TableCell>
-                  <TableCell>Sheet #{reservation.sheetNumber}</TableCell>
-                  <TableCell>{getSlotBadge(reservation.slot)}</TableCell>
-                  <TableCell>
-                    {new Date(reservation.reservationDate).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    {new Date(reservation.startDate).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    {reservation.endDate 
-                      ? new Date(reservation.endDate).toLocaleDateString()
-                      : 'N/A'}
-                  </TableCell>
-                  <TableCell>{getStatusBadge(reservation.status)}</TableCell>
-                  <TableCell>
-                    {reservation.status === 'active' && (
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleCancelReservation(reservation.$id)}
-                      >
-                        Cancel
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <DataTable
+          columns={columns}
+          data={reservations}
+          isLoading={loading}
+          searchableColumns={[
+            {
+              id: "studentName",
+              placeholder: "Search student name...",
+            },
+            {
+              id: "sheetNumber",
+              placeholder: "Search sheet number...",
+            },
+          ]}
+          filterableColumns={[
+            {
+              id: "status",
+              title: "Status",
+              options: [
+                { value: "active", label: "Active" },
+                { value: "completed", label: "Completed" },
+                { value: "cancelled", label: "Cancelled" },
+              ],
+            },
+            {
+              id: "slot",
+              title: "Time Slot",
+              options: [
+                { value: "full_time", label: "Full Time" },
+                { value: "first_half", label: "First Half" },
+                { value: "last_half", label: "Last Half" },
+              ],
+            },
+          ]}
+        />
+
+        {currentReservation && (
+          <ReservationForm
+            mode="edit"
+            reservationData={currentReservation}
+            open={isDialogOpen}
+            onOpenChange={(open) => {
+              if (!open) {
+                setCurrentReservation(null);
+              }
+              setIsDialogOpen(open);
+            }}
+            // onSuccess={() => {
+            //   fetchReservations();
+            //   setIsDialogOpen(false);
+            //   setCurrentReservation(null);
+            // }}
+          />
         )}
       </CardContent>
     </Card>

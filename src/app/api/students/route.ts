@@ -18,6 +18,8 @@ export async function GET() {
             phone: student.phone,
             father_name: student.father_name,
             address: student.address,
+            email: student.email,
+            join_date: student.join_date,
             is_active: student.is_active,
         }));
 

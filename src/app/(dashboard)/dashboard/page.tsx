@@ -18,11 +18,7 @@ interface SheetStats {
 const Dashboard = () => {
   const [stats, setStats] = useState<SheetStats | null>(null);
   const [loading, setLoading] = useState(true);
-  // Dummy Data - Replace with Appwrite calls later
-  const totalSheets = 60;
-  const freeSheets = 20;
-  const fullyOccupiedSheets = 25;
-  const halfOccupiedSheets = 15; // Combines first/last half for simplicity in display
+
 
   useEffect(() => {
     const fetchStats = async () => {

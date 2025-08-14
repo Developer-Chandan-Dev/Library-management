@@ -3,23 +3,24 @@
 import { motion } from "motion/react";
 import Navbar from "./Navbar";
 import Image from "next/image";
-import {getCurrentUser} from "@/lib/actions/user.actions";
-import {useState, useEffect} from "react";
-import { type User } from '@/types'
+import { getCurrentUser } from "@/lib/actions/user.actions";
+import { useState, useEffect } from "react";
+import { type User } from "@/types";
+import Link from "next/link";
 
 export function HeroSection() {
-    const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<User>();
 
-    useEffect(() => {
-        (async()=>{
-            const user = await getCurrentUser();
-            console.log("User:",user);
-            if (user){
-                setUser(user);
-            }
-        })();
-    }, []);
-    console.log("User :", user);
+  useEffect(() => {
+    (async () => {
+      const user = await getCurrentUser();
+      console.log("User:", user);
+      if (user) {
+        setUser(user);
+      }
+    })();
+  }, []);
+  console.log("User :", user);
   return (
     <div>
       <Navbar />
@@ -85,9 +86,11 @@ export function HeroSection() {
           <button className="w-60 transform rounded-lg bg-black px-6 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
             See Available Sheets
           </button>
-          <button className="w-60 transform rounded-lg border border-gray-300 bg-white px-6 py-2 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-100 dark:border-gray-700 dark:bg-black dark:text-white dark:hover:bg-gray-900">
-            Join Now
-          </button>
+          <Link href="/register">
+            <button className="w-60 transform rounded-lg border border-gray-300 bg-white px-6 py-2 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-100 dark:border-gray-700 dark:bg-black dark:text-white dark:hover:bg-gray-900">
+              Register Now
+            </button>
+          </Link>
         </motion.div>
         <motion.div
           initial={{

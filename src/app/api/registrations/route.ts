@@ -3,9 +3,10 @@ import { createAdminClient } from "@/lib/appwrite";
 import { appwriteConfig } from "@/lib/appwrite/config";
 import { ID } from "node-appwrite";
 
-  export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest) {
     try {
       const { studentName, fatherName, email, phone, address } = await req.json();
+      console.log(studentName, fatherName, email, phone, address, 9);
 
       // Validate required fields
       if (!studentName || !fatherName || !email || !phone || !address) {
@@ -16,10 +17,6 @@ import { ID } from "node-appwrite";
       }
 
       const { databases } = await createAdminClient();
-
-      if(!appwriteConfig.databaseId || appwriteConfig.registrationCollectionId){
-        return "Not Allowed";
-      }
 
       // Create registration document
       const registration = await databases.createDocument(
