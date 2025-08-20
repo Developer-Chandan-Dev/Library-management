@@ -18,7 +18,7 @@ interface SheetStats {
 const Dashboard = () => {
   const [stats, setStats] = useState<SheetStats | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [activeFilter, setActiveFilter] = useState("all"); // New state for active filter
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -37,12 +37,28 @@ const Dashboard = () => {
     fetchStats();
   }, []);
 
-  // Dummy data for the chart, now including colors
-  const chartData = [
-    { name: "Free Sheets", value: stats?.free, color: "#82ca9d" },
-    { name: "Fully Occupied", value: stats?.full, color: "#ffc658" },
-    { name: "Half Occupied", value: stats?.half, color: "#8884d8" },
-  ];
+  // Create filtered chart data based on active filter
+  const getFilteredChartData = () => {
+    const baseData = [
+      { name: "Free Sheets", value: stats?.free, color: "#82ca9d" },
+      { name: "Fully Occupied", value: stats?.full, color: "#ffc658" },
+      { name: "Half Occupied", value: stats?.half, color: "#8884d8" },
+    ];
+
+    switch (activeFilter) {
+      case "free":
+        return baseData.filter(item => item.name === "Free Sheets");
+      case "full":
+        return baseData.filter(item => item.name === "Fully Occupied");
+      case "half":
+        return baseData.filter(item => item.name === "Half Occupied");
+      case "all":
+      default:
+        return baseData;
+    }
+  };
+
+  const chartData = getFilteredChartData();
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -113,10 +129,30 @@ const Dashboard = () => {
             <CardTitle>Quick Filters</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
-            <Button variant="outline">Show Free</Button>
-            <Button variant="outline">Show Fully Occupied</Button>
-            <Button variant="outline">Show Half Occupied</Button>
-            <Button variant="secondary">Show All</Button>
+            <Button 
+              variant={activeFilter === "free" ? "default" : "outline"} 
+              onClick={() => setActiveFilter("free")}
+            >
+              Show Free
+            </Button>
+            <Button 
+              variant={activeFilter === "full" ? "default" : "outline"} 
+              onClick={() => setActiveFilter("full")}
+            >
+              Show Fully Occupied
+            </Button>
+            <Button 
+              variant={activeFilter === "half" ? "default" : "outline"} 
+              onClick={() => setActiveFilter("half")}
+            >
+              Show Half Occupied
+            </Button>
+            <Button 
+              variant={activeFilter === "all" ? "secondary" : "outline"} 
+              onClick={() => setActiveFilter("all")}
+            >
+              Show All
+            </Button>
           </CardContent>
         </Card>
       </div>

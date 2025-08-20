@@ -56,7 +56,7 @@ export interface Reservation {
   status: "active" | "completed" | "cancelled";
 }
 
-export interface Attendence{
+export interface Attendance{
   $id?: string | undefined;
   studentId: string;
   studentName: string;

@@ -16,7 +16,7 @@ export function HeroSection() {
       const user = await getCurrentUser();
       console.log("User:", user);
       if (user) {
-        setUser(user);
+        setUser(user as User);
       }
     })();
   }, []);
@@ -121,3 +121,4 @@ export function HeroSection() {
     </div>
   );
 }
+

@@ -104,6 +104,9 @@ export function AddStudentForm({
         phone: values.phone,
         email: values.email,
         address: values.address,
+        slot: "full_time",
+        sheetNumber: 0,
+        join_date: ""
       });
       console.log("Success: ",success);
       if (success) {

@@ -3,8 +3,9 @@
 import {createAdminClient} from "@/lib/appwrite";
 import {appwriteConfig} from "@/lib/appwrite/config";
 import {Query} from 'node-appwrite'
+import { Sheet } from '@/types'
 
-const getSheets = async () => {
+const getSheets = async (): Promise<Sheet[] | null> => {
     try{
         const { databases } = await createAdminClient();
 
@@ -15,10 +16,11 @@ const getSheets = async () => {
 
         if(total === 0) return null;
 
-        return sheets;
+        return sheets as unknown as Sheet[];
 
     }catch(error){
         console.log(error);
+        return null;
     }
 };
 

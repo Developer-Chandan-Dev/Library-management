@@ -19,6 +19,135 @@ import ReservationForm from "../reservation-management/ReservationForm";
 import { deleteStudent } from "@/lib/actions/students.action";
 import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog";
 
+// Create a separate component for the actions cell to properly use hooks
+const StudentActionsCell = ({ row }: { row: { original: Student } }) => {
+  const student = row.original;
+  const [reservationDialogOpen, setReservationDialogOpen] = React.useState(false);
+  const [editDialogOpen, setEditDialogOpen] = React.useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
+  const handleDelete = async (permanent: boolean) => {
+    if (!student.$id) return;
+
+    setIsDeleting(true);
+    const toastId = toast.loading(
+      permanent ? "Deleting permanently..." : "Moving to trash...",
+      { description: "Please wait while we process your request" }
+    );
+
+    try {
+      const result = await deleteStudent(student.$id, {
+        softDelete: !permanent,
+      });
+
+      if (result?.success) {
+        toast.success(
+          permanent ? "Permanently deleted!" : "Student moved to trash",
+          {
+            id: toastId,
+            description: `${student.name} has been ${
+              permanent ? "permanently removed" : "moved to trash"
+            }`,
+          }
+        );
+      } else {
+        throw new Error(result?.message || "Failed to delete student");
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "An error occurred while deleting";
+      toast.error("Deletion failed", {
+        id: toastId,
+        description: errorMessage,
+      });
+    } finally {
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
+    }
+  };
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="end"
+          onCloseAutoFocus={(e) => e.preventDefault()}
+        >
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.preventDefault();
+              navigator.clipboard.writeText(JSON.stringify(student.$id));
+            }}
+          >
+            Copy ID
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.preventDefault();
+              setEditDialogOpen(true);
+            }}
+          >
+            Edit Student
+          </DropdownMenuItem>
+          {!student.sheetNumber && (
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.preventDefault();
+                setReservationDialogOpen(true);
+              }}
+            >
+              Reserve Sheet
+            </DropdownMenuItem>
+          )}
+
+          <DropdownMenuItem
+            className="text-red-600"
+            onClick={(e) => {
+              e.preventDefault();
+              setDeleteDialogOpen(true);
+            }}
+          >
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDelete}
+        itemName={student.name}
+        isLoading={isDeleting}
+      />
+
+      {editDialogOpen && (
+        <EditStudentDialog
+          student={student}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+        />
+      )}
+
+      <ReservationForm
+        mode="add"
+        studentData={student}
+        open={reservationDialogOpen}
+        onOpenChange={setReservationDialogOpen}
+      />
+    </>
+  );
+};
+
 export const columns: ColumnDef<Student>[] = [
   {
     accessorKey: "name",
@@ -146,133 +275,6 @@ export const columns: ColumnDef<Student>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const student = row.original;
-      const [reservationDialogOpen, setReservationDialogOpen] =
-        React.useState(false);
-      const [editDialogOpen, setEditDialogOpen] = React.useState(false);
-      const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
-      const [isDeleting, setIsDeleting] = React.useState(false);
-
-      const handleDelete = async (permanent: boolean) => {
-        if (!student.$id) return;
-
-        setIsDeleting(true);
-        const toastId = toast.loading(
-          permanent ? "Deleting permanently..." : "Moving to trash...",
-          { description: "Please wait while we process your request" }
-        );
-
-        try {
-          const result = await deleteStudent(student.$id, {
-            softDelete: !permanent,
-          });
-
-          if (result?.success) {
-            toast.success(
-              permanent ? "Permanently deleted!" : "Student moved to trash",
-              {
-                id: toastId,
-                description: `${student.name} has been ${
-                  permanent ? "permanently removed" : "moved to trash"
-                }`,
-              }
-            );
-            // refreshData(); // Refresh the table data
-          } else {
-            throw new Error(result?.message || "Failed to delete student");
-          }
-        } catch (error: any) {
-          toast.error("Deletion failed", {
-            id: toastId,
-            description: error.message || "An error occurred while deleting",
-          });
-        } finally {
-          setIsDeleting(false);
-          setDeleteDialogOpen(false);
-        }
-      };
-
-      return (
-        <>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              onCloseAutoFocus={(e) => e.preventDefault()}
-            >
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigator.clipboard.writeText(student.$id || "No ID");
-                }}
-              >
-                Copy ID
-              </DropdownMenuItem>
-
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.preventDefault();
-                  setEditDialogOpen(true);
-                }}
-              >
-                Edit Student
-              </DropdownMenuItem>
-              {!student.sheetNumber && (
-                <DropdownMenuItem
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setReservationDialogOpen(true);
-                  }}
-                >
-                  Reserve Sheet
-                </DropdownMenuItem>
-              )}
-
-              <DropdownMenuItem
-                className="text-red-600"
-                onClick={(e) => {
-                  e.preventDefault();
-                   setDeleteDialogOpen(true);
-                }}
-              >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-                {/* Use the reusable dialog */}
-          <DeleteConfirmationDialog
-            open={deleteDialogOpen}
-            onOpenChange={setDeleteDialogOpen}
-            onConfirm={handleDelete}
-            itemName={student.name}
-            isLoading={isDeleting}
-          />
-
-          {/* Dialogs rendered outside dropdown */}
-          {editDialogOpen && (
-            <EditStudentDialog
-              student={student}
-              open={editDialogOpen}
-              onOpenChange={setEditDialogOpen}
-            />
-          )}
-
-          <ReservationForm
-            mode="add"
-            studentData={student}
-            open={reservationDialogOpen}
-            onOpenChange={setReservationDialogOpen}
-          />
-        </>
-      );
-    },
+    cell: ({ row }) => <StudentActionsCell row={row} />,
   },
 ];

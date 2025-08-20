@@ -51,6 +51,7 @@ const getAllStudents = async (): Promise<StudentDocument[] | []> => {
     );
 
     if (total === 0) return [];
+    console.log("Student: ", students);
     return students as unknown as StudentDocument[];
   } catch (error) {
     console.log(error);

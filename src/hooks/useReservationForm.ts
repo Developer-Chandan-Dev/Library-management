@@ -14,10 +14,10 @@ const formSchema = z.object({
     message: "Student name must be at least 2 characters.",
   }),
   slot: z.enum(["full_time", "first_half", "last_half"], {
-    required_error: "Please select a time slot.",
+    message: "Please select a time slot.",
   }),
   sheetNumber: z.number({
-    error: "Please select a sheet.",
+    message: "Please select a sheet.",
   }),
   startDate: z.string().min(2, {
     message: "Start date is required",
@@ -25,9 +25,19 @@ const formSchema = z.object({
   endDate: z.string().optional(),
 });
 
+type FormValues = z.infer<typeof formSchema>;
+
 const formatDateForInput = (dateString: string | undefined): string => {
   if (!dateString) return "";
   return dateString.substring(0, 10);
+};
+
+type UseReservationFormProps = {
+  mode: "add" | "edit";
+  studentData?: Partial<Student>;
+  reservationData?: Partial<Reservation>;
+  onOpenChange?: (open: boolean) => void;
+  open?: boolean;
 };
 
 export const useReservationForm = ({
@@ -36,13 +46,7 @@ export const useReservationForm = ({
   reservationData,
   onOpenChange,
   open,
-}: {
-  mode: "add" | "edit";
-  studentData?: Partial<Student>;
-  reservationData?: Partial<Reservation>;
-  onOpenChange?: (open: boolean) => void;
-  open?: boolean;
-}) => {
+}: UseReservationFormProps) => {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { sheets, updateSheet } = useSheetAvailability();
@@ -58,11 +62,11 @@ export const useReservationForm = ({
   const isOpen = open !== undefined ? open : isDialogOpen;
   const setIsOpen = onOpenChange || setIsDialogOpen;
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      studentId: studentData ? studentData.$id : "",
-      studentName: studentData ? studentData.name : "",
+      studentId: studentData?.$id || "",
+      studentName: studentData?.name || "",
       slot: undefined,
       sheetNumber: 0,
       startDate: "",
@@ -70,10 +74,31 @@ export const useReservationForm = ({
     },
   });
 
+  const isSheetDisabled = React.useCallback((sheet: Sheet): boolean => {
+    if (!selectedSlot) return true;
+
+    if (mode === "edit" && reservationData?.sheetNumber === sheet.sheetNumber) {
+      return false;
+    }
+
+    if (sheet.fullTimeName) return true;
+
+    switch (selectedSlot) {
+      case "full_time":
+        return !!(sheet.firstHalfName || sheet.lastHalfName);
+      case "first_half":
+        return !!sheet.firstHalfName;
+      case "last_half":
+        return !!sheet.lastHalfName;
+      default:
+        return true;
+    }
+  }, [selectedSlot, mode, reservationData?.sheetNumber]);
+
   // Update selectedSlot when slot changes in the form
   React.useEffect(() => {
     const subscription = form.watch((value, { name }) => {
-      if (name === "slot") {
+      if (name === "slot" && value.slot) {
         setSelectedSlot(value.slot);
       }
     });
@@ -95,12 +120,12 @@ export const useReservationForm = ({
   React.useEffect(() => {
     if (isOpen && reservationData) {
       form.reset({
-        studentId: reservationData.studentId,
-        studentName: reservationData.studentName,
+        studentId: reservationData.studentId || "",
+        studentName: reservationData.studentName || "",
         slot: reservationData.slot,
         sheetNumber: reservationData.sheetNumber || 0,
-        startDate: formatDateForInput(reservationData?.startDate),
-        endDate: formatDateForInput(reservationData?.endDate || ""),
+        startDate: formatDateForInput(reservationData.startDate),
+        endDate: formatDateForInput(reservationData.endDate),
       });
 
       setPreviousSheetSlot({
@@ -122,27 +147,6 @@ export const useReservationForm = ({
     }
   }, [isOpen, reservationData, studentData, form]);
 
-  const isSheetDisabled = (sheet: Sheet) => {
-    if (!selectedSlot) return true;
-
-    if (mode === "edit" && reservationData?.sheetNumber === sheet.sheetNumber) {
-      return false;
-    }
-
-    if (sheet.fullTimeName) return true;
-
-    switch (selectedSlot) {
-      case "full_time":
-        return !!(sheet.firstHalfName || sheet.lastHalfName);
-      case "first_half":
-        return !!sheet.firstHalfName;
-      case "last_half":
-        return !!sheet.lastHalfName;
-      default:
-        return true;
-    }
-  };
-
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       form.reset();
@@ -152,14 +156,19 @@ export const useReservationForm = ({
     setIsOpen(open);
   };
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
     try {
       let result;
       if (mode === "add") {
         result = await createReservation(values);
-        if (!result?.success) {
-          throw new Error(result?.message || "Failed to create reservation");
+        // Check if result is a string (error message)
+        if (typeof result === "string") {
+          throw new Error(result);
+        }
+        // Check if result has success property and it's false
+        if ("success" in result && !result.success) {
+          throw new Error(result.message || "Failed to create reservation");
         }
         updateSheet(values.sheetNumber, values.slot, values.studentName);
         toast.success("Reservation created successfully!");
@@ -173,8 +182,13 @@ export const useReservationForm = ({
           previousSheetNumber: previousSheetSlot.sheetNumber,
           previousSlot: previousSheetSlot.slot,
         });
-        if (!result?.success) {
-          throw new Error(result?.message || "Failed to update reservation");
+        // Check if result is a string (error message)
+        if (typeof result === "string") {
+          throw new Error(result);
+        }
+        // Check if result has success property and it's false
+        if ("success" in result && !result.success) {
+          throw new Error(result.message || "Failed to update reservation");
         }
         if (previousSheetSlot.sheetNumber && previousSheetSlot.slot) {
           updateSheet(
@@ -187,9 +201,12 @@ export const useReservationForm = ({
         toast.success("Reservation updated successfully!");
       }
       handleOpenChange(false);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error submitting form:", error);
-      toast.error(error.message || "An error occurred. Please try again.");
+      const errorMessage = error instanceof Error
+        ? error.message
+        : "An error occurred. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

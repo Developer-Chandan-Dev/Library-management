@@ -3,7 +3,8 @@
 import { ID } from "node-appwrite";
 import { createAdminClient } from "@/lib/appwrite";
 import { appwriteConfig } from "@/lib/appwrite/config";
-import { Attendance } from '@/types'
+// import { Attendance } from "@/types";
+
 
 interface CheckInData {
   studentId: string;
@@ -128,7 +129,7 @@ export async function getAttendanceSummary() {
     // Calculate summary statistics
     const totalStudents = attendanceRecords.total;
     const currentlyInLibrary = attendanceRecords.documents.filter(
-      (record: Attendence) => !record.exitTime
+      (record) => !record.exitTime
     ).length;
 
     return {

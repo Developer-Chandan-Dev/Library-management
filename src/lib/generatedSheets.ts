@@ -2,6 +2,7 @@
 
 import { dummySheets } from "@/constants/data";
 import { getSheets } from "@/lib/actions/sheets.actions";
+import { Sheet } from "@/types";
 
 type SheetData = {
   sheetNumber: number;
@@ -11,15 +12,11 @@ type SheetData = {
   fullTimeName?: string;
 };
 
-type RawAssignment = {
-  sheetNumber: number;
-  status: "free" | "half" | "full";
+// Extended type for server data which includes student objects
+type ServerSheet = Sheet & {
   firstHalfStudent?: { name: string };
   lastHalfStudent?: { name: string };
   fullTimeStudent?: { name: string };
-  firstHalfName?: string;
-  lastHalfName?: string;
-  fullTimeName?: string;
 };
 
 const USE_SERVER_DATA = true;
@@ -39,26 +36,26 @@ export const generatedSheets = async (): Promise<SheetData[]> => {
 
   if (!rawSheets) return Array.from(sheetMap.values());
 
-  rawSheets.forEach((assignment: RawAssignment) => {
+  rawSheets.forEach((assignment: Sheet | ServerSheet) => {
     const sheet = sheetMap.get(assignment.sheetNumber);
 
     if (!sheet) return;
 
     // Extract names
     const firstHalfName =
-        USE_SERVER_DATA && assignment.firstHalfStudent
-            ? assignment.firstHalfStudent.name
-            : assignment.firstHalfName;
+      USE_SERVER_DATA && (assignment as ServerSheet).firstHalfStudent
+        ? (assignment as ServerSheet).firstHalfStudent!.name
+        : assignment.firstHalfName;
 
     const lastHalfName =
-        USE_SERVER_DATA && assignment.lastHalfStudent
-            ? assignment.lastHalfStudent.name
-            : assignment.lastHalfName;
+      USE_SERVER_DATA && (assignment as ServerSheet).lastHalfStudent
+        ? (assignment as ServerSheet).lastHalfStudent!.name
+        : assignment.lastHalfName;
 
     const fullTimeName =
-        USE_SERVER_DATA && assignment.fullTimeStudent
-            ? assignment.fullTimeStudent.name
-            : assignment.fullTimeName;
+      USE_SERVER_DATA && (assignment as ServerSheet).fullTimeStudent
+        ? (assignment as ServerSheet).fullTimeStudent!.name
+        : assignment.fullTimeName;
 
     // Determine correct status and names
     if (assignment.status === "full") {
@@ -74,16 +71,16 @@ export const generatedSheets = async (): Promise<SheetData[]> => {
         sheet.firstHalfName = undefined;
         sheet.lastHalfName = undefined;
       }
-    } else if (assignment.status === "half" && !lastHalfName) {
-      sheet.firstHalfName = firstHalfName;
-      sheet.fullTimeName = undefined;
-      // If another half already exists, now both = full
-      sheet.status = sheet.lastHalfName ? "full" : "half";
-    } else if (assignment.status === "half" && !firstHalfName) {
-      sheet.lastHalfName = lastHalfName;
-      sheet.fullTimeName = undefined;
-      // If another half already exists, now both = full
-      sheet.status = sheet.firstHalfName ? "full" : "half";
+    } else if (assignment.status === "half") {
+      if (firstHalfName && !lastHalfName) {
+        sheet.firstHalfName = firstHalfName;
+        sheet.fullTimeName = undefined;
+        sheet.status = sheet.lastHalfName ? "full" : "half";
+      } else if (lastHalfName && !firstHalfName) {
+        sheet.lastHalfName = lastHalfName;
+        sheet.fullTimeName = undefined;
+        sheet.status = sheet.firstHalfName ? "full" : "half";
+      }
     }
 
     sheetMap.set(assignment.sheetNumber, sheet);

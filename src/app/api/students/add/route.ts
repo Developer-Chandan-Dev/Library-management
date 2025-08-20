@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
             phone,
             address,
             sheetNumber,
+            join_date: ""
         });
 
         if (!result || result === "Please fill in all fields") {

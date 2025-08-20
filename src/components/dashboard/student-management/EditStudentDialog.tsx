@@ -28,7 +28,7 @@ export function EditStudentDialog({
         previousSlot: student.slot,
       });
 
-      return result;
+      return result.success;
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Update failed");
       return false;

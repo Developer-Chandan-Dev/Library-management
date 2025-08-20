@@ -367,7 +367,7 @@ async function updateSheetStatus(
     }
 
     // Prepare update data
-    const sheetData: Sheet = {
+    const sheetData: Partial<Sheet> = {
       is_active: true,
     };
 
@@ -553,7 +553,7 @@ export async function updateReservation(
     } else if (slot === "last_half") {
       sheetData.lastHalfName = studentName;
       sheetData.status = newSheet?.firstHalfName ? "full" : "half";
-      sheetData.fullTime = undefined;
+      sheetData.fullTimeName = undefined;
     }
 
     if (newSheet) {
@@ -708,7 +708,7 @@ export async function deleteReservation(
     return {
       success: false,
       message: "Failed to delete reservation",
-      error: error instanceof Error ? error.message : "Unknown error"
+      // error: error instanceof Error ? error.message : "Unknown error"
     };
   }
 }

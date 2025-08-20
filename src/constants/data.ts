@@ -10,6 +10,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Rakesh Sharma',
     address: "Barna, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s2",
@@ -20,6 +21,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Jitesh Verma',
     address: "Latif Pur, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s3",
@@ -29,6 +31,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Shubham Mehta',
     address: "Barna, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s4",
@@ -39,6 +42,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Jitesh Gupta',
     address: "Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s5",
@@ -48,6 +52,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Rajesh Singh',
     address: "Barna, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s6",
@@ -58,6 +63,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Shubham Tiwari',
     address: "Latif Pur, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s7",
@@ -67,6 +73,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Sagar Yadav',
     address: "Barna, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s8",
@@ -77,6 +84,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Shubham Chauhan',
     address: "Barna, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s9",
@@ -87,6 +95,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Dinesh Kumar',
     address: "Barna, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s10",
@@ -97,6 +106,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Salman Khan',
     address: "Barna, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s101",
@@ -107,6 +117,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Mahesh Sharma',
     address: "Barna, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s102",
@@ -117,6 +128,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Yash Joshi',
     address: "Barna, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s103",
@@ -127,6 +139,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Rakesh Verma',
     address: "Barna, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s104",
@@ -136,6 +149,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Rajesh Tiwari',
     address: "Barna, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s105",
@@ -145,6 +159,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Kuldeep Yadav',
     address: "Barna, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s106",
@@ -154,6 +169,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Shaym Singh',
     address: "Barna, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s107",
@@ -163,6 +179,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Shiva Patel',
     address: "Barna, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s108",
@@ -172,6 +189,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Arjun Kumar Gupta',
     address: "Barna, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s109",
@@ -181,6 +199,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Shivam Jain',
     address: "Barna, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
   {
     "$id": "s110",
@@ -190,6 +209,7 @@ export const dummyStudents: Student[] = [
     father_name: 'Shobhit Agarwal',
     address: "Barna, Phulpur, Prayagraj",
     is_active: true,
+    join_date: new Date().toISOString(),
   },
 ];
 
