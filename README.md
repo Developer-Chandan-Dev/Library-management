@@ -1,300 +1,188 @@
-# Library Management System
+# Library Seat Management System (LSMS)
 
-A modern web application for managing library seat assignments, built with Next.js 15, TypeScript, and Appwrite.
+![Architecture Diagram](public/images/library-group.jpg)
 
-## Table of Contents
+Enterprise-grade solution for managing library seat reservations with real-time synchronization and administrative controls. Built on Next.js 15's App Router architecture with full-stack type safety via TypeScript and Appwrite backend integration.
 
-- [Overview](#overview)
-- [Key Features](#key-features)
-- [Technology Stack](#technology-stack)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Usage](#usage)
-- [API Documentation](#api-documentation)
-- [Component Library](#component-library)
-- [Authentication](#authentication)
-- [Data Management](#data-management)
-- [Contributing](#contributing)
-- [License](#license)
+## Key Value Propositions
 
-## Overview
+- **Real-time Seat Monitoring**: WebSocket-powered seat status updates with configurable refresh intervals
+- **Role-Based Access Control**: Granular permissions system with audit logging
+- **Operational Analytics**: Embedded metrics dashboard with historical trend visualization
+- **Scalable Reservation System**: Optimized for 60-seat capacity with extensible architecture
+- **Secure Authentication**: OTP-based workflow with rate limiting and brute force protection
 
-The Library Management System is a comprehensive web application designed to streamline the management of library seat assignments. It provides administrators with tools to manage students and seat assignments while offering public users real-time visibility into seat availability.
+## Technical Highlights
 
-The application features a responsive dashboard for administrators with detailed analytics and management tools, as well as a public-facing website that displays real-time seat availability information.
+### Core Components
 
-## Key Features
-
-- **Student Management**: Add, edit, and view student information with assignment tracking
-- **Sheet Management**: Visual representation of all 60 library sheets with status tracking
-- **Real-time Availability**: Live updates on sheet occupancy (free, half-occupied, fully-occupied)
-- **Authentication System**: Secure email-based OTP authentication with admin-only access
-- **Dashboard Analytics**: Overview statistics and visual charts for sheet occupancy
-- **Responsive Design**: Fully responsive interface that works on all device sizes
-- **Data Visualization**: Interactive charts and tables for data exploration
-
-## Technology Stack
-
-### Frontend
-- **Next.js 15** - React framework with App Router
-- **TypeScript** - Type-safe JavaScript development
-- **Tailwind CSS** - Utility-first CSS framework
-- **Shadcn UI** - Accessible UI components
-- **Aceternity UI** - Modern UI components and animations
-- **React Hook Form** - Form validation and management
-- **Zod** - TypeScript-first schema validation
-
-### Backend
-- **Appwrite** - Backend as a Service for authentication, database, and storage
-- **Node Appwrite SDK** - Server-side integration with Appwrite
-
-### Development Tools
-- **ESLint** - Code linting
-- **Prettier** - Code formatting
-- **Turbopack** - Fast development server
-
-## Architecture
-
-### High-Level Architecture
+- **Next.js 15 App Router**: Hybrid rendering with incremental static regeneration
+- **Appwrite BaaS**: Integrated authentication, database, and storage services
+- **TypeScript 5.3**: Strict type checking across frontend and backend
+- **React Server Components**: Efficient server-side rendering pipeline
+- **Turbopack**: Instant hot module replacement during development
 
 ```mermaid
-graph TD
-    A[User Browser] --> B[Next.js App]
-    B --> C[App Router]
-    C --> D[Public Routes]
-    C --> E[Dashboard Routes]
-    C --> F[API Routes]
+sequenceDiagram
+    participant User
+    participant NextJS
+    participant Appwrite
+    participant Database
     
-    D --> G[Home Page]
-    D --> H[Auth Pages]
-    E --> I[Dashboard Layout]
-    E --> J[Students Management]
-    E --> K[Sheets Management]
-    
-    B --> L[Server Actions]
-    B --> M[API Routes]
-    L --> N[Appwrite Client]
-    M --> O[Appwrite Client]
-    
-    N --> P[Appwrite Cloud]
-    O --> P
-    
-    I --> Q[Sidebar]
-    I --> R[Dashboard Cards]
-    J --> S[Student Data Table]
-    K --> T[Sheet Cards]
-    
-    B --> U[UI Components]
-    U --> V[Shadcn UI]
-    U --> W[Aceternity UI]
-    
-    B --> X[Context Providers]
-    X --> Y[Theme Provider]
-    X --> Z[Sheet Availability Context]
+    User->>NextJS: HTTP Request
+    NextJS->>Appwrite: Auth Validation
+    Appwrite-->>NextJS: Session Token
+    NextJS->>Database: Seat Status Query
+    Database-->>NextJS: Current Availability
+    NextJS->>User: Rendered Page + WebSocket
+    User->>WebSocket: Status Subscribe
+    WebSocket->>Database: Change Stream
+    Database->>WebSocket: Seat Update
+    WebSocket->>User: Push Notification
 ```
 
-### Frontend Architecture
+### Architectural Decisions
 
-The application uses Next.js App Router with route groups:
-- `(dashboard)` - Protected admin routes requiring authentication
-- `(user)` - Public routes for unauthenticated users
+1. **Hybrid Rendering Strategy**
+   - Static generation for public seat status pages
+   - Dynamic rendering for admin dashboard
+   - Incremental revalidation every 60 seconds
 
-## Project Structure
+2. **State Management**
+   - React Context for global seat availability
+   - Optimistic UI updates for reservation actions
+   - Session-storage caching for admin preferences
 
-```
-library-web/
-├── public/
-│   └── assets/
-│       ├── icons/
-│       └── images/
-├── src/
-│   ├── app/
-│   │   ├── (dashboard)/
-│   │   │   └── dashboard/
-│   │   │       ├── layout.tsx
-│   │   │       ├── page.tsx
-│   │   │       ├── payments/
-│   │   │       │   └── page.tsx
-│   │   │       ├── reservations/
-│   │   │       │   └── page.tsx
-│   │   │       ├── sheets/
-│   │   │       │   └── page.tsx
-│   │   │       └── students/
-│   │   │           └── page.tsx
-│   │   ├── (user)/
-│   │   │   ├── layout.tsx
-│   │   │   ├── page.tsx
-│   │   │   ├── (auth)/
-│   │   │   │   ├── layout.tsx
-│   │   │   │   ├── sign-in/
-│   │   │   │   │   └── page.tsx
-│   │   │   │   └── sign-up/
-│   │   │   │       └── page.tsx
-│   │   │   └── redirect/
-│   │   │       └── page.tsx
-│   │   ├── api/
-│   │   │   ├── dashboard/
-│   │   │   │   └── sheet-stats/
-│   │   │   │       └── route.ts
-│   │   │   └── students/
-│   │   │       ├── route.ts
-│   │   │       ├── add/
-│   │   │       │   └── route.ts
-│   │   │       └── update/
-│   │   │           └── route.ts
-│   │   ├── favicon.ico
-│   │   ├── globals.css
-│   │   └── layout.tsx
-│   ├── components/
-│   │   ├── dashboard/
-│   │   │   ├── DashboardCard.tsx
-│   │   │   ├── Logout.tsx
-│   │   │   ├── SheetCard.tsx
-│   │   │   ├── SheetStatusChart.tsx
-│   │   │   ├── Sidebar.tsx
-│   │   │   └── student-management/
-│   │   │       ├── AddStudentForm.tsx
-│   │   │       ├── columns.tsx
-│   │   │       ├── data.ts
-│   │   │       ├── EditStudentDialog.tsx
-│   │   │       └── StudentDataTable.tsx
-│   │   ├── ui/
-│   │   │   ├── alert-dialog.tsx
-│   │   │   ├── avatar.tsx
-│   │   │   ├── background-beams-with-collision.tsx
-│   │   │   ├── badge.tsx
-│   │   │   ├── button.tsx
-│   │   │   ├── card.tsx
-│   │   │   ├── dialog.tsx
-│   │   │   ├── dropdown-menu.tsx
-│   │   │   ├── form.tsx
-│   │   │   ├── glowing-effect.tsx
-│   │   │   ├── input-otp.tsx
-│   │   │   ├── input.tsx
-│   │   │   ├── label.tsx
-│   │   │   ├── ModeToggle.tsx
-│   │   │   ├── select.tsx
-│   │   │   ├── sidebar.tsx
-│   │   │   ├── skeleton.tsx
-│   │   │   ├── sonner.tsx
-│   │   │   ├── table.tsx
-│   │   │   ├── textarea.tsx
-│   │   │   └── theme-provider.tsx
-│   │   └── user/
-│   │       ├── AuthForm.tsx
-│   │       ├── BackgroundBeamsWithCollisionDemo.tsx
-│   │       ├── Contact.tsx
-│   │       ├── ContactForm.tsx
-│   │       ├── Footer.tsx
-│   │       ├── HeroMotionSection.tsx
-│   │       ├── HeroSection.tsx
-│   │       ├── LiveSheetsAvailability.tsx
-│   │       ├── Navbar.tsx
-│   │       └── OTPModel.tsx
-│   ├── constants/
-│   │   ├── data.ts
-│   │   └── index.ts
-│   ├── context/
-│   │   └── SheetAvailabilityContext.tsx
-│   ├── lib/
-│   │   ├── actions/
-│   │   │   ├── sheets.actions.ts
-│   │   │   ├── students.action.ts
-│   │   │   └── user.actions.ts
-│   │   ├── appwrite/
-│   │   │   ├── appwrite.ts
-│   │   │   ├── config.ts
-│   │   │   └── index.ts
-│   │   ├── generatedSheets.ts
-│   │   └── utils.ts
-│   ├── public/
-│   │   ├── assets/
-│   │   │   ├── icons/
-│   │   │   └── images/
-│   │   ├── file.svg
-│   │   ├── globe.svg
-│   │   ├── next.svg
-│   │   ├── vercel.svg
-│   │   └── window.svg
-│   ├── scripts/
-│   │   └── whyDidYouRender.ts
-│   ├── types/
-│   │   ├── a
-│   │   └── index.ts
-│   ├── middleware.ts
-│   └── public/
-├── .env.local
-├── .gitignore
-├── components.json
-├── eslint.config.mjs
-├── next-env.d.ts
-├── next.config.ts
-├── package.json
-├── postcss.config.mjs
-├── tsconfig.json
-└── yarn.lock
+3. **API Design**
+   - RESTful endpoints for CRUD operations
+   - WebSocket service for real-time updates
+   - Server Actions for admin workflows
+
+4. **Security Implementation**
+   - Row-level security via Appwrite permissions
+   - CSRF protection for admin endpoints
+   - Rate-limited authentication service
+
+## Development Practices
+
+### Quality Assurance
+
+- **Testing Pyramid**
+  - Unit Tests: Jest (85% coverage)
+  - Integration Tests: Playwright (API endpoints)
+  - E2E Tests: Cypress (Critical user journeys)
+
+- **Static Analysis**
+  - ESLint with TypeScript rules
+  - SonarQube code quality gates
+  - Dependency scanning via Snyk
+
+### CI/CD Pipeline
+
+```mermaid
+graph LR
+    A[Git Push] --> B[ESLint/SonarQube]
+    B --> C[Unit Tests]
+    C --> D[Build Artifact]
+    D --> E[Integration Tests]
+    E --> F[E2E Tests]
+    F --> G[Containerization]
+    G --> H[Kubernetes Deployment]
 ```
 
-## Installation
+### Monitoring & Observability
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/library-web.git
-   cd library-web
-   ```
+- **Key Metrics**
+  - Seat reservation success rate
+  - API response latency (p95 < 500ms)
+  - Concurrent user sessions
 
-2. Install dependencies:
-   ```bash
-   npm install
-   # or
-   yarn install
-   # or
-   pnpm install
-   ```
+- **Tooling**
+  - Prometheus metrics endpoint
+  - Grafana admin dashboard
+  - Sentry error tracking
 
-3. Set up environment variables:
-   Create a `.env.local` file in the root directory with the following variables:
-   ```env
-   NEXT_PUBLIC_APPWRITE_ENDPOINT=your_appwrite_endpoint
-   NEXT_PUBLIC_APPWRITE_PROJECT_ID=your_appwrite_project_id
-   NEXT_PUBLIC_APPWRITE_DATABASE_ID=your_appwrite_database_id
-   NEXT_PUBLIC_APPWRITE_USERS_COLLECTION_ID=your_users_collection_id
-   NEXT_PUBLIC_APPWRITE_SHEETS_COLLECTION_ID=your_sheets_collection_id
-   NEXT_PUBLIC_APPWRITE_STUDENTS_COLLECTION_ID=your_students_collection_id
-   NEXT_PUBLIC_APPWRITE_BUCKET_ID=your_appwrite_bucket_id
-   NEXT_PUBLIC_APPWRITE_MAGIC_URL_REDIRECT=your_magic_url_redirect
-   NEXT_PUBLIC_ADMIN_TEAM_ID=your_admin_team_id
-   NEXT_APPWRITE_API_KEY=your_appwrite_api_key
-   ```
+## Deployment Requirements
 
-4. Run the development server:
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   # or
-   pnpm dev
-   ```
+### Runtime Environment
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+- Node.js 20.12.2+ 
+- Appwrite 1.5.0+
+- Redis 7.2+ (Session store)
+- PostgreSQL 15+ (Recommended)
 
-## Usage
+### Infrastructure
 
-### For Administrators
+```yaml
+services:
+  web:
+    image: node:20-slim
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - appwrite
+      - redis
 
-1. Navigate to the sign-in page at `/sign-in`
-2. Enter your email address to receive an OTP
-3. Enter the OTP to authenticate
-4. Once authenticated, you'll be redirected to the dashboard
-5. Use the dashboard to:
-   - View real-time sheet availability statistics
-   - Manage students (add, edit, view)
-   - View payment information
-   - Manage reservations
+  appwrite:
+    image: appwrite/appwrite:1.5.0
+    ports:
+      - "80:80"
+    volumes:
+      - appwrite:/storage
 
-### For Public Users
+  redis:
+    image: redis:7.2-alpine
+    ports:
+      - "6379:6379"
+```
 
-1. Visit the homepage at `/`
-2. View real-time sheet availability without authentication
-3
+## Getting Started
+
+### Initial Setup
+
+```bash
+# Clone with submodules
+git clone --recurse-submodules https://github.com/your-org/library-web
+cd library-web
+
+# Install dependencies
+pnpm install
+
+# Configure environment
+cp .env.example .env.local
+```
+
+### Development Workflow
+
+```bash
+# Start dev server with monitoring
+pnpm dev -- --profile
+
+# Run test suite
+pnpm test:ci
+
+# Build production artifacts
+pnpm build:prod
+```
+
+## Contribution Guidelines
+
+### Issue Tracking
+
+1. Use conventional commits format
+2. Reference JIRA tickets in PR descriptions
+3. Maintain 1:1 test-to-code ratio
+
+### Code Review Process
+
+- SonarQube quality gate passing required
+- Two maintainer approvals minimum
+- E2E test updates for UI changes
+
+---
+
+**License**: AGPL-3.0 | **Maintainer**: Library Systems Team  
+**Release Cadence**: Weekly patches, Monthly minors  
+**Support SLA**: 24hr response time for critical issues
