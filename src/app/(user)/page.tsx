@@ -11,7 +11,6 @@ import { FAQSection } from "@/components/user/FAQSection";
 
 const Home = async () => {
   const user = await getCurrentUser();
-  console.log(user);
 
   return (
     <div className="relative mx-auto my-10 flex max-w-7xl flex-col items-center justify-center">

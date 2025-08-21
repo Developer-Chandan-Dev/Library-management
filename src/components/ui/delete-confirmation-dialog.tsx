@@ -30,7 +30,7 @@ export function DeleteConfirmationDialog({
   itemName,
   isLoading = false,
 }: DeleteConfirmationDialogProps) {
-  console.log(itemName,)
+  
   const [permanentDelete, setPermanentDelete] = React.useState(false);
 
   const handleConfirm = () => {

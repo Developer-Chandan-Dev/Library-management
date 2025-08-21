@@ -1,13 +1,15 @@
+// src/components/user/AuthForm.tsx
 "use client";
 import { z } from "zod";
 import React from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -19,7 +21,7 @@ import OtpModal from "./OTPModel";
 import { createAccount, signInUser } from "@/lib/actions/user.actions";
 import { Label } from "../ui/label";
 import { cn } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail, User, BookOpen } from "lucide-react";
 
 // Interface for the AuthForm component props
 interface AuthFormProps {
@@ -87,96 +89,141 @@ const AuthForm = ({ type }: AuthFormProps) => {
 
   return (
     <>
-      <Form {...form}>
-        <div
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="shadow-input dark:shadow-input mx-auto w-full max-w-md rounded-sm bg-gray-200 p-4 md:rounded-2xl md:p-8 dark:bg-black"
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={type}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+          className="w-full max-w-md"
         >
-          <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-200">
-            {type === "sign-in" ? "Sign In" : "Sign Up"}
-          </h2>
-          <p className="mt-2 max-w-sm text-sm text-neutral-600 dark:text-neutral-300">
-            Login to aceternity if you can because we don&apos;t have a login
-            flow yet
-          </p>
-          <form className="my-8" onSubmit={form.handleSubmit(onSubmit)}>
-            {type === "sign-up" && (
-              <FormField
-                control={form.control}
-                name="fullname"
-                render={({ field }) => (
-                  <FormItem className="mb-4">
-                    <LabelInputContainer>
-                      <Label htmlFor="fullname" className="shad-form-label">
-                        Full Name
-                      </Label>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter your full name"
-                          className="shad-input"
-                          id="fullname"
-                          {...field}
-                        />
-                      </FormControl>
-                    </LabelInputContainer>
+          <Card className="bg-white/5 backdrop-blur-md border border-white/10 shadow-2xl">
+            <CardContent className="p-8">
+              <div className="text-center mb-8">
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-600">
+                    <BookOpen className="h-8 w-8 text-white" />
+                  </div>
+                </div>
+                <h2 className="text-2xl font-bold text-white">
+                  {type === "sign-in" ? "Welcome Back" : "Create Account"}
+                </h2>
+                <p className="text-gray-300 mt-2">
+                  {type === "sign-in"
+                    ? "Sign in to access your digital library"
+                    : "Join us to explore thousands of resources"}
+                </p>
+              </div>
 
-                    <FormMessage className="shad-form-message" />
-                  </FormItem>
-                )}
-              />
-            )}
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-6"
+                >
+                  {type === "sign-up" && (
+                    <FormField
+                      control={form.control}
+                      name="fullname"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Label className="text-white">Full Name</Label>
+                          <div className="relative">
+                            <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                            <FormControl>
+                              <Input
+                                placeholder="Enter your full name"
+                                className="pl-10 bg-white/5 border-white/10 text-white"
+                                {...field}
+                              />
+                            </FormControl>
+                          </div>
+                          <FormMessage className="text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem className="mb-6">
-                  <LabelInputContainer>
-                    <Label className="shad-form-label">Email</Label>
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <Label className="text-white">Email</Label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <FormControl>
+                            <Input
+                              placeholder="Enter your email"
+                              className="pl-10 bg-white/5 border-white/10 text-white"
+                              {...field}
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage className="text-red-400" />
+                      </FormItem>
+                    )}
+                  />
 
-                    <FormControl>
-                      <Input
-                        placeholder="Enter your email"
-                        className="shad-input"
-                        {...field}
-                      />
-                    </FormControl>
-                  </LabelInputContainer>
+                  {error && (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-red-400 text-sm text-center"
+                    >
+                      {error}
+                    </motion.p>
+                  )}
 
-                  <FormMessage className="shad-form-message" />
-                </FormItem>
-              )}
-            />
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {type === "sign-in"
+                          ? "Signing In..."
+                          : "Creating Account..."}
+                      </>
+                    ) : type === "sign-in" ? (
+                      "Sign In"
+                    ) : (
+                      "Sign Up"
+                    )}
+                  </Button>
 
-            <Button
-              className="group/btn relative h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset] flex items-center gap-2"
-              type="submit"
-              disabled={isLoading}
-            >
-              <span>{type === "sign-in" ? "Sign In" : "Sign Up"}</span>
-              {isLoading && <Loader2 className="ml-2 animate-spin size-6" />}
-              <BottomGradient />
-            </Button>
+                  {type === "sign-in" && (
+                    <div className="text-center py-3">
+                      <Link
+                        href="/forgot-password"
+                        className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                      >
+                        {/* Forgot your password? */}
+                      </Link>
+                    </div>
+                  )}
 
-            {error && <p className="error-message">*{error}</p>}
-
-            <div className="body-2 flex justify-center mt-4  text-[14px]">
-              <p className="text-light-100 text-[14px]">
-                {type === "sign-in"
-                  ? "Don't have an account?"
-                  : "Already have an account?"}
-              </p>
-              <Link
-                href={type === "sign-in" ? "/sign-up" : "/sign-in"}
-                className="ml-1 font-medium text-brand"
-              >
-                {" "}
-                {type === "sign-in" ? "Sign Up" : "Sign In"}
-              </Link>
-            </div>
-          </form>
-        </div>
-      </Form>
+                  <div className="text-center text-sm text-gray-300">
+                    <p>
+                      {type === "sign-in"
+                        ? "Don't have an account?"
+                        : "Already have an account?"}
+                      <Link
+                        href={type === "sign-in" ? "/sign-up" : "/sign-in"}
+                        className="ml-1 font-medium text-blue-400 hover:text-blue-300 transition-colors"
+                      >
+                        {type === "sign-in" ? "Sign Up" : "Sign In"}
+                      </Link>
+                    </p>
+                  </div>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </AnimatePresence>
 
       {accountId && (
         <OtpModal
@@ -189,26 +236,3 @@ const AuthForm = ({ type }: AuthFormProps) => {
 };
 
 export default AuthForm;
-
-const BottomGradient = () => {
-  return (
-    <>
-      <span className="absolute inset-x-0 -bottom-px block h-px w-full bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-0 transition duration-500 group-hover/btn:opacity-100" />
-      <span className="absolute inset-x-10 -bottom-px mx-auto block h-px w-1/2 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-0 blur-sm transition duration-500 group-hover/btn:opacity-100" />
-    </>
-  );
-};
-
-const LabelInputContainer = ({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => {
-  return (
-    <div className={cn("flex w-full flex-col space-y-2", className)}>
-      {children}
-    </div>
-  );
-};

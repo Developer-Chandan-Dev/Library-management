@@ -88,7 +88,6 @@ export function LiveSeatAvailability() {
     return () => clearInterval(interval);
   }, []);
 
-  console.log("Seat Data: ", seatData);
   return (
     <ul className="flex items-center justify-center gap-5 flex-wrap">
       <GridItem

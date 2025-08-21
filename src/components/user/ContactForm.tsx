@@ -34,7 +34,6 @@ export default function ContactForm() {
       const data = await res.json();
 
       if (res.ok) {
-        console.log(data.message);
         // Reset form fields
         setName("");
         setPhone("");

@@ -25,7 +25,6 @@ const Dashboard = () => {
       try {
         const res = await fetch("/api/dashboard/sheet-stats");
         const data: SheetStats = await res.json();
-        console.log("Sheet data", data);
         setStats(data);
       } catch (error) {
         console.error("Failed to load sheet stats:", error);

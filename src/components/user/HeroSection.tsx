@@ -14,13 +14,13 @@ export function HeroSection() {
   useEffect(() => {
     (async () => {
       const user = await getCurrentUser();
-      console.log("User:", user);
+
       if (user) {
         setUser(user as User);
       }
     })();
   }, []);
-  console.log("User :", user);
+
   return (
     <div>
       <Navbar />

@@ -108,7 +108,7 @@ export function AddStudentForm({
         sheetNumber: 0,
         join_date: ""
       });
-      console.log("Success: ",success);
+
       if (success) {
         form.reset();
         setIsOpen(false);

@@ -143,7 +143,6 @@ export const columns: ColumnDef<Payment>[] = [
       const refreshData = () => {
         // This will be provided by the DataTable component
         // For now, we'll just log it
-        console.log("Refresh data called")
       }
       
       return payment.status === 'pending' || payment.status === 'overdue' ? (

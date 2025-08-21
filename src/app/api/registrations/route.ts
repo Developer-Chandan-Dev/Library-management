@@ -6,7 +6,6 @@ import { ID } from "node-appwrite";
 export async function POST(req: NextRequest) {
     try {
       const { studentName, fatherName, email, phone, address } = await req.json();
-      console.log(studentName, fatherName, email, phone, address, 9);
 
       // Validate required fields
       if (!studentName || !fatherName || !email || !phone || !address) {

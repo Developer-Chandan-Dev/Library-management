@@ -40,7 +40,6 @@ const ReservationManagement = () => {
   }, [fetchReservations]);
 
   const handleEditClick = useCallback((reservation: Reservation) => {
-    console.log("Reservation data:", reservation);
     setCurrentReservation(reservation);
     setIsDialogOpen(true);
 }, []);

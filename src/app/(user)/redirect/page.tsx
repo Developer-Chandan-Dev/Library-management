@@ -10,12 +10,10 @@ export default function RedirectPage() {
   useEffect(() => {
     const checkRole = async () => {
       const user = await account.get();
-      console.log(user);
       if (!user) {
         router.replace("/login");
         return;
-      }
-      console.log("User ID:", user.$id);
+      
       // Fetch memberships to determine user role
       const memberships = await teams.listMemberships(
         ADMIN_TEAM_ID,
@@ -25,7 +23,6 @@ export default function RedirectPage() {
       const isAdmin =
         memberships.total > 0 &&
         memberships.memberships[0].roles.includes("admin");
-      console.log("Is Admin:", isAdmin);
 
       if (isAdmin) {
         router.replace("/dashboard");
