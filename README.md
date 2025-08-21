@@ -1,6 +1,6 @@
 # Library Seat Management System (LSMS)
 
-![Architecture Diagram](public/images/library-group.jpg)
+![Architecture Diagram](public/images/home-page.jpg)
 
 Enterprise-grade solution for managing library seat reservations with real-time synchronization and administrative controls. Built on Next.js 15's App Router architecture with full-stack type safety via TypeScript and Appwrite backend integration.
 
