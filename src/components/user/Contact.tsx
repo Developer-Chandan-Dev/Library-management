@@ -31,7 +31,7 @@ const Contact = () => {
           <ContactForm />
           <div className="lg:w-1/2 w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0">
             <h2 className="text-sm title-font text-gray-500 tracking-widest">
-              G.B. TECH
+              Digital Library
             </h2>
             <h2 className="text-neutral-900 font-bold text-3xl title-font mb-1">
               Contact Us
@@ -105,7 +105,7 @@ const Contact = () => {
                   <h2 className="font-medium title-font text-sm text-gray-900 mb-1 tracking-wider">
                     Timing
                   </h2>
-                  <p className="leading-relaxed">Mon - Fri 9:00 AM - 6:00 PM</p>
+                  <p className="leading-relaxed">Mon - Sun 7:00 AM - 7:00 PM</p>
                 </div>
               </div>
             </div>

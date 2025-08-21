@@ -70,15 +70,21 @@ const RegistrationForm = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         <FormField
           control={form.control}
           name="studentName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Student Name</FormLabel>
+              <FormLabel className="text-sm md:text-base">Student Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your full name" {...field} />
+                <Input
+                  placeholder="Enter your full name"
+                  className="h-12 md:h-14 text-sm md:text-base"
+                  inputMode="text"
+                  autoComplete="name"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -90,9 +96,15 @@ const RegistrationForm = () => {
           name="fatherName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Father's Name</FormLabel>
+              <FormLabel className="text-sm md:text-base">Father's Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your father's full name" {...field} />
+                <Input
+                  placeholder="Enter your father's full name"
+                  className="h-12 md:h-14 text-sm md:text-base"
+                  inputMode="text"
+                  autoComplete="name"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -104,9 +116,15 @@ const RegistrationForm = () => {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel className="text-sm md:text-base">Email</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your email address" {...field} />
+                <Input
+                  placeholder="Enter your email address"
+                  className="h-12 md:h-14 text-sm md:text-base"
+                  inputMode="email"
+                  autoComplete="email"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -118,9 +136,15 @@ const RegistrationForm = () => {
           name="phone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone Number</FormLabel>
+              <FormLabel className="text-sm md:text-base">Phone Number</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your phone number" {...field} />
+                <Input
+                  placeholder="Enter your phone number"
+                  className="h-12 md:h-14 text-sm md:text-base"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -132,11 +156,12 @@ const RegistrationForm = () => {
           name="address"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Address</FormLabel>
+              <FormLabel className="text-sm md:text-base">Address</FormLabel>
               <FormControl>
-                <Textarea 
-                  placeholder="Enter your full address" 
-                  className="resize-none" 
+                <Textarea
+                  placeholder="Enter your full address"
+                  className="resize-none h-32 md:h-40 text-sm md:text-base"
+                  inputMode="text"
                   {...field} 
                 />
               </FormControl>
@@ -145,7 +170,11 @@ const RegistrationForm = () => {
           )}
         />
         
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          className="w-full h-14 text-base md:text-lg md:col-span-2"
+          disabled={isSubmitting}
+        >
           {isSubmitting ? "Submitting..." : "Submit Registration"}
         </Button>
       </form>

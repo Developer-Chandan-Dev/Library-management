@@ -35,7 +35,7 @@ export function HeroSection() {
       </div>
       <div className="px-4 py-10 md:py-20">
         <h1 className="relative z-10 mx-auto max-w-4xl text-center text-2xl font-bold text-slate-700 md:text-4xl lg:text-7xl dark:text-slate-300">
-          {"📚 Welcome to Our Smart Study Sheet System"
+          {"📚 Smart Library Seating Management"
             .split(" ")
             .map((word, index) => (
               <motion.span
@@ -66,9 +66,8 @@ export function HeroSection() {
           }}
           className="relative z-10 mx-auto max-w-xl py-4 text-center text-lg font-normal text-neutral-600 dark:text-neutral-400"
         >
-          Easily manage and view real-time sheet availability for full-time and
-          part-time learners. We help you stay focused with an organized seating
-          system built for productivity.
+          Effortlessly find and reserve study spaces in real-time. Track seat availability,
+          manage your bookings, and optimize your library experience with smart occupancy monitoring.
         </motion.p>
         <motion.div
           initial={{
@@ -83,16 +82,21 @@ export function HeroSection() {
           }}
           className="relative z-10 mt-8 flex flex-wrap items-center justify-center gap-4"
         >
-          <button className="w-60 transform rounded-lg bg-black px-6 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
-            See Available Sheets
-          </button>
-          <Link href="/register">
-            <button className="w-60 transform rounded-lg border border-gray-300 bg-white px-6 py-2 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-100 dark:border-gray-700 dark:bg-black dark:text-white dark:hover:bg-gray-900">
-              Register Now
+            <button
+              onClick={() => document.getElementById('live-availability')?.scrollIntoView({ behavior: 'smooth' })}
+              className="w-60 transform rounded-lg bg-black px-6 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+            >
+              View Available Seats
             </button>
-          </Link>
+          {!user && (
+            <Link href="/register">
+              <button className="w-60 transform rounded-lg border border-gray-300 bg-white px-6 py-2 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-100 dark:border-gray-700 dark:bg-black dark:text-white dark:hover:bg-gray-900">
+                Book Now
+              </button>
+            </Link>
+          )}
         </motion.div>
-        <motion.div
+        {/* <motion.div
           initial={{
             opacity: 0,
             y: 10,
@@ -109,14 +113,14 @@ export function HeroSection() {
         >
           <div className="w-full overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700">
             <Image
-              src="https://assets.aceternity.com/pro/aceternity-landing.webp"
-              alt="Landing page preview"
+              src="/images/study-area.jpg"
+              alt="Students using library seating area"
               className="aspect-[16/9] h-auto w-full object-cover"
               height={1000}
               width={1000}
             />
           </div>
-        </motion.div>
+        </motion.div> */}
       </div>
     </div>
   );
