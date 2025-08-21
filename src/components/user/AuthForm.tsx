@@ -20,7 +20,6 @@ import {
 import OtpModal from "./OTPModel";
 import { createAccount, signInUser } from "@/lib/actions/user.actions";
 import { Label } from "../ui/label";
-import { cn } from "@/lib/utils";
 import { Loader2, Mail, User, BookOpen } from "lucide-react";
 
 // Interface for the AuthForm component props

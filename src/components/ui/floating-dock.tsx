@@ -1,17 +1,8 @@
 // src/components/ui/floating-dock.tsx
 "use client";
 import { cn } from "@/lib/utils";
-import { IconLayoutNavbarCollapse } from "@tabler/icons-react";
-import {
-  AnimatePresence,
-  MotionValue,
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-} from "framer-motion";
+import { motion } from "framer-motion";
 import Link from "next/link";
-import { useRef, useState } from "react";
 
 export const FloatingDock = ({
   items,

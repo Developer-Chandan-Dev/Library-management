@@ -2,7 +2,7 @@ import { HeroSection } from "@/components/user/HeroSection";
 import Footer from "../../components/user/Footer";
 import Contact from "../../components/user/Contact";
 import { LiveSeatAvailability } from "@/components/user/LiveSeatAvailability";
-import { getCurrentUser } from "@/lib/actions/user.actions";
+// import { getCurrentUser } from "@/lib/actions/user.actions";
 import FeatureGrid from "@/components/user/FeatureGrid";
 import { HowItWorks } from "@/components/user/HowItWorks";
 import { StatsSection } from "@/components/user/StatsSection";
@@ -10,7 +10,7 @@ import Link from "next/link";
 import { FAQSection } from "@/components/user/FAQSection";
 
 const Home = async () => {
-  const user = await getCurrentUser();
+  // const user = await getCurrentUser();
 
   return (
     <div className="relative mx-auto my-10 flex max-w-7xl flex-col items-center justify-center">

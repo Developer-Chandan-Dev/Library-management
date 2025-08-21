@@ -1,6 +1,5 @@
 // src/app/(auth)/layout.tsx
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { FloatingDock } from "@/components/ui/floating-dock";
 
@@ -80,16 +79,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             </p>
           </div>
           
-          {/* <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
-            <Image
-              src="/images/library-group.jpg"
-              alt="Modern Library"
-              width={400}
-              height={300}
-              className="relative rounded-lg transition-all duration-300 group-hover:scale-105"
-            />
-          </div> */}
 
           {/* Feature highlights */}
           <div className="grid grid-cols-2 gap-4 mt-8">

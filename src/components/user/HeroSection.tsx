@@ -2,7 +2,6 @@
 
 import { motion } from "motion/react";
 import Navbar from "./Navbar";
-import Image from "next/image";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import { useState, useEffect } from "react";
 import { type User } from "@/types";

@@ -77,6 +77,7 @@ const OtpModal = ({ accountId, email, type = "sign-in", isOpen = true, onClose }
         }, 1500);
       }
     } catch (error) {
+      console.log("Error", error);
       setError("Invalid OTP. Please try again.");
     } finally {
       setIsLoading(false);
@@ -96,6 +97,7 @@ const OtpModal = ({ accountId, email, type = "sign-in", isOpen = true, onClose }
         setSuccess("");
       }, 3000);
     } catch (error) {
+      console.log("Error: ", error);
       setError("Failed to resend OTP. Please try again.");
     } finally {
       setIsLoading(false);
