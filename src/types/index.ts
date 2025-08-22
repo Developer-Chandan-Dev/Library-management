@@ -84,3 +84,11 @@ export interface PaymentHistory {
   paymentDate: string;
   receiptNumber: string;
 }
+export interface Contact {
+  $id?: string;
+  name: string;
+  email: string;
+  message: string;
+  phone?: string;
+  status: "readed" | "unread";
+}

@@ -10,6 +10,7 @@ export const appwriteConfig = {
   paymentCollectionId: process.env.NEXT_PUBLIC_APPWRITE_PAYMENTS_COLLECTION_ID!,
   paymentHistoryCollectionId: process.env.NEXT_PUBLIC_APPWRITE_PAYMENT_HISTORY_COLLECTION_ID!,
   attendanceCollectionId: process.env.NEXT_PUBLIC_APPWRITE_ATTENDANCE_COLLECTION_ID!,
+  contactCollectionId: process.env.NEXT_PUBLIC_APPWRITE_CONTACT_COLLECTION_ID!,
   bucketId: process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID!,
   magicUrlRedirect: process.env.NEXT_PUBLIC_APPWRITE_MAGIC_URL_REDIRECT!,
   adminTeamId: process.env.NEXT_PUBLIC_ADMIN_TEAM_ID!,

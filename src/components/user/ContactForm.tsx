@@ -4,6 +4,8 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { cn } from "@/lib/utils";
 import { Textarea } from "../ui/textarea";
+import { createContactSubmission } from "@/lib/actions/contact.action";
+import { toast } from 'sonner'
 
 export default function ContactForm() {
   const [name, setName] = React.useState("");
@@ -16,38 +18,40 @@ export default function ContactForm() {
     e.preventDefault();
     setSubmitting(true);
 
+    // Show loading toast
+    const toastId = toast.loading("Submitting your message...");
+
     try {
-      const res = await fetch("/api/submit-form", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          formType: "contact", // Specify the form type
-          name,
-          phone,
-          email,
-          message,
-        }),
+      const result = await createContactSubmission({
+        name,
+        phone,
+        email,
+        message,
       });
 
-      const data = await res.json();
-
-      if (res.ok) {
+      if (result.success) {
+        // Show success toast
+        toast.success("Form submitted successfully!", { id: toastId });
+        
         // Reset form fields
         setName("");
         setPhone("");
         setEmail("");
         setMessage("");
       } else {
-        console.error("Error:", data.error);
+        // Show error toast
+        toast.error(result.message || "Failed to submit form", { id: toastId });
       }
-      setSubmitting(false);
+      
     } catch (error) {
       console.error("Error submitting form:", error);
+      // Show error toast
+      toast.error("An unexpected error occurred. Please try again.", { id: toastId });
+    } finally {
       setSubmitting(false);
     }
   };
+  
   return (
     <div className="shadow-input mx-auto w-full max-w-md bg-white py-4 rounded-2xl p-4 md:p-8 dark:bg-black">
       <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-200">
@@ -77,7 +81,6 @@ export default function ContactForm() {
               placeholder="9876543210"
               type="text"
               value={phone}
-              required
               onChange={(e) => setPhone(e.target.value)}
             />
           </LabelInputContainer>
@@ -105,8 +108,9 @@ export default function ContactForm() {
         </LabelInputContainer>
 
         <button
-          className="group/btn relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset]"
+          className="group/btn relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset] disabled:opacity-50"
           type="submit"
+          disabled={submitting}
         >
           {submitting ? "Submitting..." : "Send →"}
           <BottomGradient />

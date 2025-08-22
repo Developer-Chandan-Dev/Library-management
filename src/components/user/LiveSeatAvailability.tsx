@@ -84,8 +84,8 @@ export function LiveSeatAvailability() {
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 10000); // Refresh every 10 seconds
-    return () => clearInterval(interval);
+    // const interval = setInterval(fetchData, 10000); // Refresh every 10 seconds
+    // return () => clearInterval(interval);
   }, []);
 
   return (

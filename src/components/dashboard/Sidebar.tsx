@@ -10,6 +10,7 @@ import {
   IconFileText,
   IconCurrencyRupee,
   IconCalendar,
+  IconUserCog,
 } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import {getCurrentUser, signOutUser} from "@/lib/actions/user.actions";
@@ -119,6 +120,13 @@ export function SidebarDemo() {
       href: "attendance",
       icon: (
         <IconCalendar className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
+      ),
+    },
+    {
+      label: "Contact Messages",
+      href: "contact-submissions",
+      icon: (
+        <IconUserCog className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
     },
     {
