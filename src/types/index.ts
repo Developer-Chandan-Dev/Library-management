@@ -7,6 +7,7 @@ export interface Reservation {
   date: string;
 }
 
+
 export type Student = {
   $id?: string | undefined;
   name: string;
@@ -30,18 +31,14 @@ export interface Sheet {
   is_active?: boolean;
 }
 
-export interface User {
-  $collectionId: string;
-  $createdAt: string;
-  $databaseId: string;
+export type User = {
   $id: string;
-  $permissions: [];
-  $sequence: number;
-  $updatedAt: string;
   accountId: string;
-  avatarId: string;
+  avatar: string;
   email: string;
   fullName: string;
+  bio?: string;
+  location?: string;
 }
 
 export interface Reservation {

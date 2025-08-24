@@ -45,13 +45,15 @@ const Navbar = () => {
       ) : (
         <div className="flex items-center gap-3">
           <span>{name || "Name not found"}</span>
-          <Image
-            width={40}
-            height={40}
-            src={avatar}
-            alt="avatar"
-            className="w-10 h-10 rounded-full"
-          />
+          <Link href="/profile">
+            <Image
+              width={40}
+              height={40}
+              src={avatar}
+              alt="avatar"
+              className="w-10 h-10 rounded-full"
+            />
+          </Link>
           <LogOut
             className="text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 transition-all duration-300 cursor-pointer size-5"
             onClick={(e) => {
