@@ -15,7 +15,7 @@ export function HeroSection() {
       const user = await getCurrentUser();
 
       if (user) {
-        setUser(user as User);
+        setUser(user as unknown as User);
       }
     })();
   }, []);

@@ -395,3 +395,40 @@ export const updateUserAvatar = async (avatarUrl: string) => {
     });
   }
 };
+
+// Note using this function logic changed OTP based to email/password login
+export const sendEmailOTP = async ({ email }: { email: string }) => {
+  const { account } = await createAdminClient();
+
+  try {
+    const session = await account.createEmailToken(ID.unique(), email);
+    return session.userId;
+  } catch (error) {
+    handleError(error, "Failed to send email OTP");
+  }
+};
+
+export const verifySecret = async ({
+  accountId,
+  password,
+}: {
+  accountId: string;
+  password: string;
+}) => {
+  try {
+    const { account } = await createAdminClient();
+
+    const session = await account.createSession(accountId, password);
+
+    (await cookies()).set("appwrite-session", session.secret, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "strict",
+      secure: true,
+    });
+
+    return parseStringify({ sessionId: session.$id });
+  } catch (error) {
+    handleError(error, "Failed to verify OTP");
+  }
+};
