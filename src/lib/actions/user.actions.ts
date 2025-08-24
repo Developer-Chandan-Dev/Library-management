@@ -234,29 +234,27 @@ export const confirmPasswordRecovery = async ({
   try {
     // Validate password strength
     if (newPassword.length < 8) {
-      return parseStringify({
-        success: false,
-        error: "Password must be at least 8 characters long",
+      return parseStringify({ 
+        success: false, 
+        error: "Password must be at least 8 characters long" 
       });
     }
 
     const { account } = await createAdminClient();
-
+    
     // Update the password using the recovery secret
     await account.updateRecovery(userId, secret, newPassword);
-
-    return parseStringify({
-      success: true,
-      message: "Password reset successfully",
+    
+    return parseStringify({ 
+      success: true, 
+      message: "Password reset successfully" 
     });
-  } catch (err) {
-    const errorMessage =
-      err instanceof Error ? err.message : "Failed to reset password";
-
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Failed to reset password";
     console.error("Password reset error:", errorMessage);
-    return parseStringify({
-      success: false,
-      error: errorMessage,
+    return parseStringify({ 
+      success: false, 
+      error: errorMessage || "Failed to reset password" 
     });
   }
 };
